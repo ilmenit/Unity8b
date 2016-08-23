@@ -1,4 +1,12 @@
+'''
+Good examples:
+- pixelator and scribble - as an FONT and GFX editor
+- editable tree model - object hierarchy
+- simple tree model -
+'''
+
 #!/usr/bin/env python
+import qdarkstyle
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -8,19 +16,34 @@ import unity8b_rc
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-
-        self.textEdit = QTextEdit()
-        self.setCentralWidget(self.textEdit)
-
         self.createActions()
         self.createMenus()
         self.createToolBars()
         self.createStatusBar()
         self.createDockWindows()
 
-        self.setWindowTitle("Dock Widgets")
+        self.readSettings()
+        self.setWindowTitle("Unity 8b - 8bit version of Unity")
 
         self.newLetter()
+
+    def closeEvent(self, event):
+        self.writeSettings()
+        event.accept()
+
+    def readSettings(self):
+        settings = QSettings("Unity8b.cfg", QSettings.IniFormat)
+        geometry = settings.value("geometry");
+        windowState = settings.value("windowState")
+        if geometry is not None:
+            self.restoreGeometry(geometry)
+        if windowState is not None:
+            self.restoreState(windowState)
+
+    def writeSettings(self):
+        settings = QSettings("Unity8b.cfg", QSettings.IniFormat)
+        settings.setValue("geometry", self.saveGeometry());
+        settings.setValue("windowState", self.saveState());
 
     def newLetter(self):
         self.textEdit.clear()
@@ -90,6 +113,15 @@ class MainWindow(QMainWindow):
         document = self.textEdit.document()
         document.undo()
 
+    def emuPlay(self):
+        pass
+
+    def emuPause(self):
+        pass
+
+    def emuStop(self):
+        pass
+
     def insertCustomer(self, customer):
         if not customer:
             return
@@ -125,24 +157,31 @@ class MainWindow(QMainWindow):
         cursor.endEditBlock()
 
     def about(self):
-        QMessageBox.about(self, "About Dock Widgets",
-                "The <b>Dock Widgets</b> example demonstrates how to use "
-                "Qt's dock widgets. You can enter your own text, click a "
-                "customer to add a customer name and address, and click "
-                "standard paragraphs to add them.")
+        QMessageBox.about(self, "About Unity 8b",
+                "<b>Unity 8b</b> is a game development environment for 8bit computers (currently Atari 8bit).\n"
+                "It is heavily inspired by Unity 3D by Unity Technologies but is not related to work of this company.")
 
     def createActions(self):
-        self.newLetterAct = QAction(QIcon(':/images/new.png'), "&New Letter",
+        self.newLetterAct = QAction(QIcon(':/icons/new.png'), "&New Letter",
                 self, shortcut=QKeySequence.New,
                 statusTip="Create a new form letter", triggered=self.newLetter)
 
-        self.saveAct = QAction(QIcon(':/images/save.png'), "&Save...", self,
+        self.saveAct = QAction(QIcon(':/icons/save.png'), "&Save...", self,
                 shortcut=QKeySequence.Save,
                 statusTip="Save the current form letter", triggered=self.save)
 
-        self.undoAct = QAction(QIcon(':/images/undo.png'), "&Undo", self,
+        self.undoAct = QAction(QIcon(':/icons/undo.png'), "&Undo", self,
                 shortcut=QKeySequence.Undo,
                 statusTip="Undo the last editing action", triggered=self.undo)
+
+        self.emuPlayAct = QAction(QIcon(':/icons/play.png'), "&Play",
+                self, statusTip="Play emulator", triggered=self.emuPlay)
+
+        self.emuPauseAct = QAction(QIcon(':/icons/pause.png'), "&Pause", self,
+                statusTip="Pause emulator", triggered=self.emuPause)
+
+        self.emuStopAct = QAction(QIcon(':/icons/stop.png'), "&Stop", self,
+                statusTip="Stop emulator", triggered=self.emuStop)
 
         self.quitAct = QAction("&Quit", self, shortcut="Ctrl+Q",
                 statusTip="Quit the application", triggered=self.close)
@@ -150,10 +189,6 @@ class MainWindow(QMainWindow):
         self.aboutAct = QAction("&About", self,
                 statusTip="Show the application's About box",
                 triggered=self.about)
-
-        self.aboutQtAct = QAction("About &Qt", self,
-                statusTip="Show the Qt library's About box",
-                triggered=QApplication.instance().aboutQt)
 
     def createMenus(self):
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -171,7 +206,6 @@ class MainWindow(QMainWindow):
 
         self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
-        self.helpMenu.addAction(self.aboutQtAct)
 
     def createToolBars(self):
         self.fileToolBar = self.addToolBar("File")
@@ -181,11 +215,24 @@ class MainWindow(QMainWindow):
         self.editToolBar = self.addToolBar("Edit")
         self.editToolBar.addAction(self.undoAct)
 
+        self.emuToolBar = self.addToolBar("Emu")
+        self.emuToolBar.addAction(self.emuPlayAct)
+        self.emuToolBar.addAction(self.emuPauseAct)
+        self.emuToolBar.addAction(self.emuStopAct)
+
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
 
-    def createDockWindows(self):
+    def createEmuWindow(self):
+        dock = QDockWidget("Emu", self)
+        dock.setObjectName("Emu")
+        self.textEdit = QTextEdit(dock)
+        dock.setWidget(self.textEdit)
+        self.addDockWidget(Qt.LeftDockWidgetArea, dock)
+
+    def createHierarchyWindow(self):
         dock = QDockWidget("Customers", self)
+        dock.setObjectName("Customers")
         dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.customerList = QListWidget(dock)
         self.customerList.addItems((
@@ -199,7 +246,9 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea, dock)
         self.viewMenu.addAction(dock.toggleViewAction())
 
+    def createPropertiesWindow(self):
         dock = QDockWidget("Paragraphs", self)
+        dock.setObjectName("Paragraphs")
         self.paragraphsList = QListWidget(dock)
         self.paragraphsList.addItems((
             "Thank you for your payment which we have received today.",
@@ -226,12 +275,18 @@ class MainWindow(QMainWindow):
         self.customerList.currentTextChanged.connect(self.insertCustomer)
         self.paragraphsList.currentTextChanged.connect(self.addParagraph)
 
+    def createDockWindows(self):
+        self.createHierarchyWindow()
+        self.createPropertiesWindow()
+        self.createEmuWindow()
 
 if __name__ == '__main__':
 
     import sys
 
     app = QApplication(sys.argv)
+    # setup stylesheet
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     mainWin = MainWindow()
     mainWin.show()
     sys.exit(app.exec_())
