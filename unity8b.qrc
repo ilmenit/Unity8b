@@ -5,6 +5,7 @@
     <file>icons/undo.png</file>
     <file>icons/play.png</file>
     <file>icons/pause.png</file>
+    <file>icons/next-frame.png</file>
     <file>icons/stop.png</file>
 </qresource>
 </RCC>
