@@ -7,7 +7,8 @@ from scene_view_window import SceneWindow
 from playfield_editor_window import PlayfieldEditorWindow
 from tileset_editor_window import TilesetEditorWindow
 from console_window import ConsoleWindow
-from palette_editor import PaletteEditorWindow
+from palette_editor_window import PaletteEditorWindow
+from color_picker_window import ColorPickerWindow
 from console import console
 
 class MainWindow(QMainWindow):
@@ -127,6 +128,7 @@ class MainWindow(QMainWindow):
         self.tilesetEditor = TilesetEditorWindow(self)
         self.console = ConsoleWindow(self)
         self.paletteEditor = PaletteEditorWindow(self)
+        self.colorPicker = ColorPickerWindow(self)
         console.init(self.console)
 
     def closeEvent_______________________(self, event):
