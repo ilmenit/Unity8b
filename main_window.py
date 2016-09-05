@@ -129,6 +129,9 @@ class MainWindow(QMainWindow):
         self.console = ConsoleWindow(self)
         self.paletteEditor = PaletteEditorWindow(self)
         self.colorPicker = ColorPickerWindow(self)
+        self.colorPicker.color_picked.connect(self.paletteEditor.changeSelectedColorRegister)
+        self.paletteEditor.inform_color_picker.connect(self.colorPicker.activateColor)
+
         console.init(self.console)
 
     def closeEvent_______________________(self, event):
