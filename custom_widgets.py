@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 
 class ColorFrame(QFrame):
     clicked = pyqtSignal(object, name='colorClicked')
+    double_clicked = pyqtSignal(object, name='colorDoubleClicked')
 
     def updateStyle(self):
         #print("updateStyle")
@@ -17,17 +18,24 @@ class ColorFrame(QFrame):
         self.borderColor = '#000000'
         self.updateStyle()
 
+    def mouseDoubleClickEvent(self,event):
+        print("Double click!")
+        self.double_clicked.emit(self.key)
+
     def mousePressEvent(self, event):
         print("ColorFrame mousePressEvent {0}".format(str(self.key)))
         self.clicked.emit(self.key)
         # return super().mousePressEvent(self, event)
 
+    def ColorToHexString(self, color):
+            return "#" + "%0.2X" % color.red() + "%0.2X" % color.green() + "%0.2X" % color.blue()
+
     def setColor(self, color):
-        self.color = "#" + color.asHexString()
+        self.color = self.ColorToHexString(color)
         self.updateStyle()
 
     def setBorder(self, color):
-        self.borderColor = "#" + color.asHexString()
+        self.borderColor = self.ColorToHexString(color)
         self.updateStyle()
 
     def deactivate(self):

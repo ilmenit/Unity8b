@@ -11,12 +11,12 @@ class CommandChangeColorRegisterValue(QUndoCommand):
         self.palette_editor_window = palette_editor_window
         self.register = register
         self.value = value
-        self.old_value = self.palette_editor_window.color_registers[self.register]
+        self.old_value = self.palette_editor_window.playfield_palette[self.register]
 
     def changeColor(self, register, value):
         print("CommandChangeColor")
-        self.palette_editor_window.color_registers[register] = value
-        self.palette_editor_window.frames[register].setColor(self.palette_editor_window.palette[value])
+        self.palette_editor_window.playfield_palette[register] = value
+        self.palette_editor_window.frames[register].setColor(self.palette_editor_window.full_palette[value])
         self.palette_editor_window.palette_changed.emit()
 
     def redo(self):
@@ -39,7 +39,7 @@ class PaletteEditorWindow(DockWindow):
         print("colorRegisterPickedHandler")
         sender = self.sender()
         self.activateColorRegister(sender.key)
-        self.inform_color_picker.emit(self.color_registers[self.selectedRegister])
+        self.inform_color_picker.emit(self.playfield_palette[self.selectedRegister])
 
     def activateColorRegister(self, register):
         print("Activating : " + str(register))
@@ -72,14 +72,15 @@ class PaletteEditorWindow(DockWindow):
 
         gridLayout.setVerticalSpacing(0)
         gridLayout.setHorizontalSpacing(0)
-        i = 0
-        for key, value in self.color_registers.items():
-            print(str(i) + " Key " + key)
+
+        for i in range(len(self.playfield_palette)):
+            value = self.playfield_palette[i]
+            print(str(i) + " value " + str(value))
             y = int(i / 16)
             x = i % 16
-            colorButton = ColorFrame(self, key)
-            self.frames[key] = colorButton
-            color = self.palette[value]
+            colorButton = ColorFrame(self, i)
+            self.frames[i] = colorButton
+            color = self.full_palette[value]
             colorButton.setColor(color)
             colorButton.clicked.connect(self.color_register_picked)
             colorButton.clicked.connect(self.colorRegisterPickedHandler)
@@ -87,8 +88,7 @@ class PaletteEditorWindow(DockWindow):
             colorButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             gridLayout.addWidget(colorButton, y, x)
             if i==0:
-                self.activateColorRegister(key)
-            i += 1
+                self.activateColorRegister(i)
 
         self.mainWidget.setLayout(verticalLayout)
         self.setWidget(self.mainWidget)
@@ -100,8 +100,8 @@ class PaletteEditorWindow(DockWindow):
     def __init__(self, parent):
         super().__init__("Palette", parent)
         palette_file = "examples/arkanoid/laoo.act"
-        self.palette = IndexedPalette(palette_file)
-        self.color_registers = ColorRegisters()
+        self.full_palette = IndexedPalette(palette_file)
+        self.playfield_palette = PlayfieldPalette()
         self.selectedRegister = None
         self.frames = dict()
         self.createWidget()
