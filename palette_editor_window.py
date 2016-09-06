@@ -57,6 +57,10 @@ class PaletteEditorWindow(DockWindow):
     def changeSelectedColorRegister(self, value):
         self.changeColorRegister(self.selectedRegister, value)
 
+    def ColorDoubleClicked(self):
+        print("DDDDDDD")
+        self.parent().colorPickerWindow.show()
+
     def createWidget(self):
         self.mainWidget = QWidget(self)
 
@@ -79,6 +83,7 @@ class PaletteEditorWindow(DockWindow):
             colorButton.setColor(color)
             colorButton.clicked.connect(self.color_register_picked)
             colorButton.clicked.connect(self.colorRegisterPickedHandler)
+            colorButton.double_clicked.connect(self.ColorDoubleClicked)
             colorButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             gridLayout.addWidget(colorButton, y, x)
             if i==0:
