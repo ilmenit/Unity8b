@@ -6,7 +6,7 @@ from dock_window import DockWindow
 
 class EmuWindow(DockWindow):
     def __init__(self, parent):
-        super().__init__(parent,"Emulator")
+        super().__init__("Emulator", parent)
         self.textEdit = QTextEdit(self)
         self.setWidget(self.textEdit)
 

@@ -100,7 +100,7 @@ class TilesetEditorWindow(DockWindow):
         self.setWidget(self.tabs)
 
     def __init__(self, parent):
-        super().__init__(parent, "Tileset Editor")
+        super().__init__("Tileset Editor", parent)
         self.createTabs(parent)
         self.data = deepcopy(default_tileset)
         self.load()

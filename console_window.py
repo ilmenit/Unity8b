@@ -14,7 +14,7 @@ class ConsoleWindow(DockWindow):
             self.textEdit.clear()
 
     def __init__(self, parent):
-        super().__init__(parent, "Console")
+        super().__init__("Console", parent)
         self.textEdit = QTextEdit(self)
         self.textEdit.append("This is a console...")
         self.textEdit.setReadOnly(True)

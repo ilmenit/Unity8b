@@ -3,6 +3,12 @@ Good examples:
 - pixelator and scribble - as an FONT and GFX editor
 - editable tree model - object hierarchy
 - simple tree model -
+
+Naming convention in the projecT:
+- Palette - set of color registers
+- Playfield - screen memory where you put tiles
+- Tiles -
+- Tileset - set of fonts
 '''
 
 #!/usr/bin/env python

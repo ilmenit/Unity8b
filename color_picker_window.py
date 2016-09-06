@@ -41,7 +41,7 @@ class ColorPickerWindow(DockWindow):
         self.setWidget(self.mainWidget)
 
     def __init__(self, parent):
-        super().__init__(parent, "Color picker")
+        super().__init__("Color picker", parent)
         palette_file = "examples/arkanoid/laoo.act"
         self.palette = IndexedPalette(palette_file)
         self.color_registers = ColorRegisters()

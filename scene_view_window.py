@@ -6,7 +6,7 @@ from dock_window import DockWindow
 
 class SceneWindow(DockWindow):
     def __init__(self, parent):
-        super().__init__(parent, "Scene View")
+        super().__init__("Scene View", parent)
         self.playfields = QListWidget(self)
         self.playfields.addItems((
             "Score Playfield",

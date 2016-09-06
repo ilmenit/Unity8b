@@ -5,12 +5,35 @@ from dock_window import DockWindow
 from custom_widgets import *
 from indexed_palette import *
 
+class CommandChangeColorRegisterValue(QUndoCommand):
+    def __init__(self, palette_editor_window, register, value):
+        super(CommandChangeColorRegisterValue, self).__init__("ChangeColorRegisterValue " + str(register) + "=" + str(value))
+        self.palette_editor_window = palette_editor_window
+        self.register = register
+        self.value = value
+        self.old_value = self.palette_editor_window.color_registers[self.register]
 
+    def changeColor(self, register, value):
+        print("CommandChangeColor")
+        self.palette_editor_window.color_registers[register] = value
+        self.palette_editor_window.frames[register].setColor(self.palette_editor_window.palette[value])
+        self.palette_editor_window.palette_changed.emit()
+
+    def redo(self):
+        print("CommandChangeColorRegisterValue::REDO")
+        self.changeColor(self.register, self.value)
+
+    def undo(self):
+        print("CommandChangeColorRegisterValue::UNDO")
+        self.changeColor(self.register, self.old_value)
 
 class PaletteEditorWindow(DockWindow):
     color_register_picked = pyqtSignal(object, name='colorRegisterPicked')
     inform_color_picker = pyqtSignal(object, name='informColorPicker')
     palette_changed = pyqtSignal(name='paletteChanged')
+
+    def focusInEvent(self, event):
+        self.parent().activateUndoStack(self.undoStack)
 
     def colorRegisterPickedHandler(self):
         print("colorRegisterPickedHandler")
@@ -27,12 +50,12 @@ class PaletteEditorWindow(DockWindow):
         self.selectedRegister = register
         self.frames[self.selectedRegister].activate()
 
+    def changeColorRegister(self, register, value):
+        print("changeColorRegister")
+        self.undoStack.push(CommandChangeColorRegisterValue(self, register, value))
+
     def changeSelectedColorRegister(self, value):
-        if self.selectedRegister is None:
-            return
-        self.color_registers[self.selectedRegister] = value
-        self.frames[self.selectedRegister].setColor(self.palette[value])
-        self.palette_changed.emit()
+        self.changeColorRegister(self.selectedRegister, value)
 
     def createWidget(self):
         self.mainWidget = QWidget(self)
@@ -70,8 +93,7 @@ class PaletteEditorWindow(DockWindow):
 
 
     def __init__(self, parent):
-        super().__init__(parent, "Palette")
-
+        super().__init__("Palette", parent)
         palette_file = "examples/arkanoid/laoo.act"
         self.palette = IndexedPalette(palette_file)
         self.color_registers = ColorRegisters()

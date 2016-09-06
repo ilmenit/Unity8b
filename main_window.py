@@ -9,19 +9,23 @@ from tileset_editor_window import TilesetEditorWindow
 from console_window import ConsoleWindow
 from palette_editor_window import PaletteEditorWindow
 from color_picker_window import ColorPickerWindow
+from undo_view_window import UndoViewWindow
 from console import console
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.undoGroup = QUndoGroup(self)
         self.createMenuActions()
         self.createMenus()
         self.createDockWindows()
         self.createToolBars()
         self.createStatusBar()
-
         self.readSettings()
         self.setWindowTitle("Unity 8b (Singularity)")
+
+    def activateUndoStack(self, undoStack):
+        self.undoGroup.setActiveStack(undoStack)
 
     def closeEvent(self, event):
         self.writeSettings()
@@ -52,9 +56,12 @@ class MainWindow(QMainWindow):
         pass
 
     def undo(self):
-        #document = self.textEdit.document()
-        #document.undo()
-        pass
+        print("MainWindow::UNDO")
+        self.undoGroup.undo()
+
+    def redo(self):
+        print("MainWindow::REDO")
+        self.undoGroup.redo()
 
 
     def about(self):
@@ -76,6 +83,10 @@ class MainWindow(QMainWindow):
                 shortcut=QKeySequence.Undo,
                 statusTip="Undo the last editing action", triggered=self.undo)
 
+        self.redoAct = QAction(QIcon(':/icons/redo.png'), "&Redo", self,
+                shortcut=QKeySequence.Redo,
+                statusTip="Redo the last editing action", triggered=self.redo)
+
 
         self.quitAct = QAction("&Quit", self, shortcut="Ctrl+Q",
                 statusTip="Quit the application", triggered=self.close)
@@ -93,6 +104,7 @@ class MainWindow(QMainWindow):
 
         self.editMenu = self.menuBar().addMenu("&Edit")
         self.editMenu.addAction(self.undoAct)
+        self.editMenu.addAction(self.redoAct)
 
         self.viewMenu = self.menuBar().addMenu("&View")
 
@@ -108,12 +120,13 @@ class MainWindow(QMainWindow):
 
         self.editToolBar = self.addToolBar("Edit")
         self.editToolBar.addAction(self.undoAct)
+        self.editToolBar.addAction(self.redoAct)
 
         self.emuToolBar = self.addToolBar("Emu")
-        self.emuToolBar.addAction(self.emulator.emuPlayAct)
-        self.emuToolBar.addAction(self.emulator.emuPauseAct)
-        self.emuToolBar.addAction(self.emulator.emuNextFrameAct)
-        self.emuToolBar.addAction(self.emulator.emuStopAct)
+        self.emuToolBar.addAction(self.emulatorWindow.emuPlayAct)
+        self.emuToolBar.addAction(self.emulatorWindow.emuPauseAct)
+        self.emuToolBar.addAction(self.emulatorWindow.emuNextFrameAct)
+        self.emuToolBar.addAction(self.emulatorWindow.emuStopAct)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
@@ -121,18 +134,19 @@ class MainWindow(QMainWindow):
 
     def createDockWindows(self):
         self.setDockOptions(QMainWindow.AnimatedDocks | QMainWindow.AllowNestedDocks | QMainWindow.AllowTabbedDocks)
-        self.scene = SceneWindow(self)
-        self.emulator = EmuWindow(self)
-        self.gfxEditor = GfxEditorWindow(self)
-        self.playfieldEditor = PlayfieldEditorWindow(self)
-        self.tilesetEditor = TilesetEditorWindow(self)
-        self.console = ConsoleWindow(self)
-        self.paletteEditor = PaletteEditorWindow(self)
-        self.colorPicker = ColorPickerWindow(self)
-        self.colorPicker.color_picked.connect(self.paletteEditor.changeSelectedColorRegister)
-        self.paletteEditor.inform_color_picker.connect(self.colorPicker.activateColor)
+        self.sceneWindow = SceneWindow(self)
+        self.emulatorWindow = EmuWindow(self)
+        self.gfxEditorWindow = GfxEditorWindow(self)
+        self.playfieldEditorWindow = PlayfieldEditorWindow(self)
+        self.tilesetEditorWindow = TilesetEditorWindow(self)
+        self.consoleWindow = ConsoleWindow(self)
+        self.paletteEditorWindow = PaletteEditorWindow(self)
+        self.colorPickerWindow = ColorPickerWindow(self)
+        self.colorPickerWindow.color_picked.connect(self.paletteEditorWindow.changeSelectedColorRegister)
+        self.paletteEditorWindow.inform_color_picker.connect(self.colorPickerWindow.activateColor)
+        self.undoViewWindow = UndoViewWindow(self)
 
-        console.init(self.console)
+        console.init(self.consoleWindow)
 
     def closeEvent_______________________(self, event):
 

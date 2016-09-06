@@ -6,6 +6,6 @@ from dock_window import DockWindow
 
 class PlayfieldEditorWindow(DockWindow):
     def __init__(self, parent):
-        super().__init__(parent, "Playfield editor")
+        super().__init__("Playfield editor", parent)
         self.something = QListWidget(self)
         self.setWidget(self.something)

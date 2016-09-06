@@ -25,32 +25,24 @@ class PaletteColorABC(metaclass=ABCMeta):
         pass
 
 class PlayfieldPalette():
+    '''
+    Set of color registers
+    '''
     def __init__(self):
         self.x = x
 
 class GfxABC(metaclass=ABCMeta):
     @abstractmethod
-    def getPixel(self, color_register):
+    def getPixel(self, x, y):
         pass
 
     @abstractmethod
-    def putPixel(self, color_register):
+    def putPixel(self, x, y, color_register_index):
         pass
 
     @abstractmethod
     def modeName(self):
         return "ModeName"
 
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
 
-a = Size(10,20)
-b = Position(20,30)
-print("A: " + str(a))
-print("B: " + str(b))
 
-'''
-How it works:
-- In
-'''

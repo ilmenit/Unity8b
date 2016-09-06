@@ -3,6 +3,7 @@
     <file>icons/new.png</file>
     <file>icons/save.png</file>
     <file>icons/undo.png</file>
+    <file>icons/redo.png</file>
     <file>icons/play.png</file>
     <file>icons/pause.png</file>
     <file>icons/next-frame.png</file>

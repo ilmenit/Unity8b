@@ -81,7 +81,7 @@ class GfxEditorWindow(DockWindow):
 
 
     def __init__(self, parent):
-        super().__init__(parent,"GfxEditor")
+        super().__init__("GfxEditor", parent)
         self.pixmap = QPixmap("examples/arkanoid/redrock.png")
         self.scene = QGraphicsScene(self)
         self.pixmapItem = QGraphicsPixmapItem(self.pixmap)

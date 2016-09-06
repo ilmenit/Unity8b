@@ -6,10 +6,14 @@ import collections
 pos = collections.namedtuple("pos", ("row, column"))
 
 class DockWindow(QDockWidget):
-    def __init__(self, parent, name):
-        super().__init__(name)
+    def __init__(self, name, parent):
+        super().__init__(name, parent)
+        self.setParent(parent)
         self.setObjectName(name)
         self.setFeatures(QDockWidget.AllDockWidgetFeatures)
         self.setAllowedAreas(Qt.AllDockWidgetAreas)
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.undoStack = QUndoStack(self)
+        parent.undoGroup.addStack(self.undoStack)
         parent.addDockWidget(Qt.TopDockWidgetArea, self)
         parent.viewMenu.addAction(self.toggleViewAction())
