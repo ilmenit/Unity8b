@@ -1,14 +1,27 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
 from dock_window import DockWindow
 import gfx_abc
 from gfx_atari import *
 
 class MyGraphicsView(QGraphicsView):
-    def __init__(self, scene):
-        super().__init__(scene)
+    mouse_pressed = pyqtSignal(QPointF, name="mousePressed")
+    mouse_moved = pyqtSignal(QPointF, name="mousePressed")
+
+    def showEvent(self, QShowEvent):
+        self.scaleToContent()
+
+    def scaleToContent(self):
+        self.resetTransform()
+        scale_x = self.width() / self.scene.width()
+        scale_y = self.height() / self.scene.height()
+        scale = min(scale_x,scale_y)
+        scale -= scale/20
+        self.scale(scale, scale)
+
+    def __init__(self, scene, parent=None):
+        super().__init__(scene, parent)
         self.scene = scene
 
     def actionEvent(self, event):
@@ -19,15 +32,17 @@ class MyGraphicsView(QGraphicsView):
 
     def mousePressEvent(self, event):
         pt = self.mapToScene(event.pos())
-        print("mousePressEvent event " + str(event))
-        print("pt " + str(pt))
+        #print("mousePressEvent event " + str(event))
+        #print("pt " + str(pt))
+        self.mouse_pressed.emit(pt)
 
     def mouseReleaseEvent(self, event):
         print("mouseReleaseEvent event " + str(event))
 
     def mouseMoveEvent(self, event):
-        print("mouseMoveEvent event " + str(event))
-
+        #print("mouseMoveEvent event " + str(event))
+        pt = self.mapToScene(event.pos())
+        self.mouse_moved.emit(pt)
 
     def wheelEvent(self, event):
         zoomInFactor = 1.25
@@ -65,19 +80,22 @@ class MyScene(QGraphicsScene):
 
 
 class GfxEditorWindow(DockWindow):
-    def drawLine(self, x1, y1, x2, y2):
-        # this is a test function
-        print("self.pixmapItem : " + str(self.pixmapItem))
-        pixmap = self.pixmapItem.pixmap()
-        print("pixmap : " + str(pixmap))
-        painter = QPainter()
-        painter.begin(pixmap)
-        pen = QPen(Qt.white)
-        painter.setPen(pen)
-        painter.drawLine(x1, y1, x2, y2)
-        painter.end()
-        self.pixmapItem.setPixmap(pixmap)
-        print("Done")
+    def resizeEvent(self, QResizeEvent):
+        self.view.scaleToContent()
+
+    def update(self):
+        self.pixmapItem.setPixmap(QPixmap.fromImage(self.gfx.toQImage()))
+
+    def mousePressedHandler(self, point):
+        #print("Pixel Edit Handler " + str(point))
+        self.gfx.putPixel(int(point.x()), int(point.y()),3)
+        self.update()
+
+    def mouseMovedHandler(self, point):
+        #print("Pixel Edit Handler " + str(point))
+        self.gfx.putPixel(int(point.x()), int(point.y()),3)
+        self.update()
+
 
     def saveOnExit(self):
         if self.wasModified:
@@ -89,14 +107,13 @@ class GfxEditorWindow(DockWindow):
     def __init__(self, parent):
         super().__init__("GfxEditor", parent)
         #self.pixmap = QPixmap("examples/arkanoid/redrock.png")
-        self.gfx = GfxAnticMode4MultipleFonts(8,24)
+        self.gfx = GfxSimple(100, 100)
         self.pixmap = QPixmap.fromImage(self.gfx.toQImage())
         self.scene = MyScene(self)
         self.pixmapItem = QGraphicsPixmapItem(self.pixmap)
         self.scene.addItem(self.pixmapItem)
-        self.scene.createGrid()
+        #self.scene.createGrid()
         self.view = MyGraphicsView(self.scene)
+        self.view.mouse_pressed.connect(self.mousePressedHandler)
+        self.view.mouse_moved.connect(self.mouseMovedHandler)
         self.setWidget(self.view)
-
-        # test
-        self.drawLine(20,20,500,500)

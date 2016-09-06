@@ -58,7 +58,6 @@ class PaletteEditorWindow(DockWindow):
         self.changeColorRegister(self.selectedRegister, value)
 
     def ColorDoubleClicked(self):
-        print("DDDDDDD")
         self.parent().colorPickerWindow.show()
 
     def createWidget(self):

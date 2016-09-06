@@ -89,13 +89,15 @@ class GfxSimple(GfxABC):
     def putPixel(self, x, y, color_register_index):
         color_value = self.color_registers[color_register_index]
         rgb_color = self.palette[color_value]
-        self.image.setPixel(x,y,rgb_color)
+        self.image.setPixel(x/2,y,rgb_color.rgb())
 
     def modeName(self):
         return "Simple"
 
     def toQImage(self):
-        return self.image
+        #return self.image
+        size = self.image.size()
+        return self.image.scaled(size.width()*2,size.height(), Qt.IgnoreAspectRatio, Qt.FastTransformation)
 
     def __init__(self, width, height):
         super().__init__()
@@ -104,4 +106,6 @@ class GfxSimple(GfxABC):
         self.color_registers = PlayfieldPalette()
         self.width = width
         self.height = height
-        self.image = QImage(self.width,self.height, QImage.Format_Indexed8)
+        self.image = QImage(self.width,self.height, QImage.Format_RGB32)
+        #self.image = QImage(self.width,self.height, QImage.Format_Indexed8)
+
