@@ -136,14 +136,16 @@ class MainWindow(QMainWindow):
         self.setDockOptions(QMainWindow.AnimatedDocks | QMainWindow.AllowNestedDocks | QMainWindow.AllowTabbedDocks)
         self.sceneWindow = SceneWindow(self)
         self.emulatorWindow = EmuWindow(self)
-        self.gfxEditorWindow = GfxEditorWindow(self)
         self.playfieldEditorWindow = PlayfieldEditorWindow(self)
         self.tilesetEditorWindow = TilesetEditorWindow(self)
         self.consoleWindow = ConsoleWindow(self)
         self.paletteEditorWindow = PaletteEditorWindow(self)
         self.colorPickerWindow = ColorPickerWindow(self)
+        self.gfxEditorWindow = GfxEditorWindow(self)
+
         self.colorPickerWindow.color_picked.connect(self.paletteEditorWindow.changeSelectedColorRegister)
         self.paletteEditorWindow.inform_color_picker.connect(self.colorPickerWindow.activateColor)
+        self.paletteEditorWindow.palette_changed.connect(self.gfxEditorWindow.update)
         self.undoViewWindow = UndoViewWindow(self)
 
         console.init(self.consoleWindow)

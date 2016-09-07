@@ -88,12 +88,14 @@ class GfxEditorWindow(DockWindow):
 
     def mousePressedHandler(self, point):
         #print("Pixel Edit Handler " + str(point))
-        self.gfx.putPixel(int(point.x()), int(point.y()),3)
+        color_index = self.parent().paletteEditorWindow.selected_color
+        self.gfx.putPixel(int(point.x()), int(point.y()),color_index)
         self.update()
 
     def mouseMovedHandler(self, point):
         #print("Pixel Edit Handler " + str(point))
-        self.gfx.putPixel(int(point.x()), int(point.y()),3)
+        color_index = self.parent().paletteEditorWindow.selected_color
+        self.gfx.putPixel(int(point.x()), int(point.y()),color_index)
         self.update()
 
 
@@ -107,7 +109,10 @@ class GfxEditorWindow(DockWindow):
     def __init__(self, parent):
         super().__init__("GfxEditor", parent)
         #self.pixmap = QPixmap("examples/arkanoid/redrock.png")
-        self.gfx = GfxSimple(100, 100)
+        self.gfx = GfxIndexedTest(100, 100,2)
+        palette = PlayfieldPalette()
+        self.gfx.setPalette(palette)
+        self.parent().paletteEditorWindow.setPalette(palette)
         self.pixmap = QPixmap.fromImage(self.gfx.toQImage())
         self.scene = MyScene(self)
         self.pixmapItem = QGraphicsPixmapItem(self.pixmap)

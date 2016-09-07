@@ -66,14 +66,12 @@ class GfxAnticMode4MultipleFonts(GfxABC):
             for x in range(self.width):
                 register_index = self.getPixel(x,y)
                 color_value = self.color_registers[register_index]
-                rgb_color = self.palette[color_value]
+                rgb_color = global_indexed_palette[color_value]
                 image.setPixel(x,y,rgb_color.rgb())
         return image
 
     def __init__(self, width, height):
         super().__init__()
-        palette_file = "examples/arkanoid/laoo.act"
-        self.palette = IndexedPalette(palette_file)
         self.color_registers = PlayfieldPalette()
         self.width = width
         self.height = height
@@ -82,30 +80,43 @@ class GfxAnticMode4MultipleFonts(GfxABC):
         self.fonts.append(MemoryBuffer(1024))
 
 
-class GfxSimple(GfxABC):
+class GfxIndexedTest(GfxABC):
     def getPixel(self, x, y):
-        rgb_color = self.image.pixel(x,y)
+        color_register_index = self.memory_buffer[y * self.width + x]
+        return color_register_index
 
     def putPixel(self, x, y, color_register_index):
-        color_value = self.color_registers[color_register_index]
-        rgb_color = self.palette[color_value]
-        self.image.setPixel(x/2,y,rgb_color.rgb())
+        self.memory_buffer[y * self.width + int(x/self.pixel_width_ration)] = color_register_index
 
     def modeName(self):
-        return "Simple"
+        return "SimpleIndexed"
+
+    def getState(self):
+        for_undo!
+        pass
+
+    def setState(self):
+        pass
 
     def toQImage(self):
-        #return self.image
-        size = self.image.size()
-        return self.image.scaled(size.width()*2,size.height(), Qt.IgnoreAspectRatio, Qt.FastTransformation)
+        image = QImage(self.width,self.height, QImage.Format_RGB32)
+        for y in range(self.height):
+            for x in range(self.width):
+                register_index = self.getPixel(x,y)
+                color_value = self.playfield_palette[register_index]
+                rgb_color = global_indexed_palette[color_value]
+                image.setPixel(x,y,rgb_color.rgb())
 
-    def __init__(self, width, height):
+        size = image.size()
+        return image.scaled(size.width()*self.pixel_width_ration,size.height(), Qt.IgnoreAspectRatio, Qt.FastTransformation)
+
+    def setPalette(self, palette):
+        self.playfield_palette = palette
+
+    def __init__(self, width, height, pixel_width_ration=1):
         super().__init__()
-        palette_file = "examples/arkanoid/laoo.act"
-        self.palette = IndexedPalette(palette_file)
-        self.color_registers = PlayfieldPalette()
+        self.memory_buffer = bytearray(width * height)
+        self.pixel_width_ration = 2
         self.width = width
         self.height = height
         self.image = QImage(self.width,self.height, QImage.Format_RGB32)
-        #self.image = QImage(self.width,self.height, QImage.Format_Indexed8)
-
