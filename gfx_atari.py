@@ -84,11 +84,16 @@ class GfxAnticMode4MultipleFonts(GfxABC):
 class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
 
     def getPixel(self, x, y):
+        if x<0 or x>=self.width or y<0 or y>=self.height:
+            return
         color_register_index = self.memory_buffer[y * self.width + x]
         return color_register_index
 
     def putPixel(self, x, y, color_register_index):
-        self.memory_buffer[y * self.width + int(x/self.pixel_width_ration)] = color_register_index
+        x = int(x / self.pixel_width_ration)
+        if x<0 or x>=self.width or y<0 or y>=self.height:
+            return
+        self.memory_buffer[y * self.width + x] = color_register_index
         self.state_changed.emit()
 
     def modeName(self):

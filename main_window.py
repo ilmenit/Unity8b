@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
 
     def redo(self):
         print("MainWindow::REDO")
-        self.undoGroup.redo()
+        self.undoStack.redo()
 
 
     def about(self):
@@ -127,7 +127,6 @@ class MainWindow(QMainWindow):
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
-        pass
 
     def createDockWindows(self):
         self.setDockOptions(QMainWindow.AnimatedDocks | QMainWindow.AllowNestedDocks | QMainWindow.AllowTabbedDocks)
