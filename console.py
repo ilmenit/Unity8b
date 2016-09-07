@@ -11,6 +11,10 @@ class console():
             cls.consoleWindow.append(to_print)
 
     @classmethod
+    def error(cls, *args):
+        cls.info(args)
+
+    @classmethod
     def clear(cls):
         if cls.consoleWindow != None:
             cls.consoleWindow.clear()

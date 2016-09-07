@@ -4,10 +4,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from array import *
 from copy import deepcopy
-
 from dock_window import DockWindow
-import logging
 from console import console
+import gfx_abc
+from gfx_atari import *
 
 default_tileset = {
     # "file_name" : "default.fnt",
@@ -18,6 +18,34 @@ default_tileset = {
     "tiles_height" : 3,
     "fonts" : array('B'),
 }
+
+class TilesetWidget(QWidget):
+
+    def update(self):
+        print("Update")
+
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.gfx = GfxIndexedTest(128*8, 8*3, 1)
+        palette = PlayfieldPalette()
+        self.old_state = None
+        self.gfx.setPalette(palette)
+        self.pixmap = QPixmap.fromImage(self.gfx.toQImage())
+        self.scene = GridScene(self, 8, 8*3, 1)
+        self.pixmapItem = QGraphicsPixmapItem(self.pixmap)
+        self.scene.addItem(self.pixmapItem)
+        self.view = MyGraphicsView(self.scene, self, False)
+        self.scene.createGrid()
+
+        mainVLayout = QVBoxLayout()
+        mainVLayout.addWidget(self.view)
+        self.setLayout(mainVLayout)
+
+        # connect slots and signalds
+        self.gfx.state_changed.connect(self.update)
+        #self.view.mouse_pressed.connect(self.mousePressedHandler)
+        #self.view.mouse_moved.connect(self.mouseMovedHandler)
+        #self.view.mouse_released.connect(self.mouseReleasedHandler)
 
 class TilesetEditorWindow(DockWindow):
 
@@ -30,11 +58,11 @@ class TilesetEditorWindow(DockWindow):
         try:
             file_size = os.path.getsize(file_name)
         except OSError:
-            logging.error("Cannot open " + file_name)
+            console.error("Cannot open " + file_name)
             return
 
         if file_size % 8 != 0:
-            logging.error("Tile file size must be dividiable by 8")
+            console.error("Tile file size must be dividiable by 8")
             return
 
         print("Loading : " + file_name)
@@ -42,9 +70,6 @@ class TilesetEditorWindow(DockWindow):
             new_data = array('B')
             new_data.fromfile(f, file_size)
             self.data['fonts'] = new_data
-
-    def tabEditor(self):
-        return QTextEdit(self)
 
     def loadFileHandler(self):
         file_name = QFileDialog.getOpenFileName()
@@ -95,7 +120,7 @@ class TilesetEditorWindow(DockWindow):
     def createTabs(self,parent):
         # add tabs
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.tabEditor(), "Editor")
+        self.tabs.addTab(TilesetWidget(self), "Editor")
         self.tabs.addTab(self.tabSettings(), "Settings")
         self.setWidget(self.tabs)
 

@@ -124,7 +124,7 @@ class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
     def __init__(self, width, height, pixel_width_ration=1):
         super().__init__()
         self.memory_buffer = bytearray(width * height)
-        self.pixel_width_ration = 2
+        self.pixel_width_ration = pixel_width_ration
         self.width = width
         self.height = height
         self.name = "sample picture"
