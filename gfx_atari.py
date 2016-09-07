@@ -5,6 +5,7 @@ from abc import ABCMeta, abstractmethod
 from collections.abc import Sequence
 from gfx_abc import *
 from indexed_palette import *
+from copy import copy
 
 class MemoryBuffer(QObject):
     '''
@@ -80,23 +81,25 @@ class GfxAnticMode4MultipleFonts(GfxABC):
         self.fonts.append(MemoryBuffer(1024))
 
 
-class GfxIndexedTest(GfxABC):
+class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
+
     def getPixel(self, x, y):
         color_register_index = self.memory_buffer[y * self.width + x]
         return color_register_index
 
     def putPixel(self, x, y, color_register_index):
         self.memory_buffer[y * self.width + int(x/self.pixel_width_ration)] = color_register_index
+        self.state_changed.emit()
 
     def modeName(self):
         return "SimpleIndexed"
 
     def getState(self):
-        for_undo!
-        pass
+        return copy(self.memory_buffer)
 
-    def setState(self):
-        pass
+    def setState(self, state):
+        self.memory_buffer = copy(state)
+        self.state_changed.emit()
 
     def toQImage(self):
         image = QImage(self.width,self.height, QImage.Format_RGB32)
@@ -119,4 +122,5 @@ class GfxIndexedTest(GfxABC):
         self.pixel_width_ration = 2
         self.width = width
         self.height = height
+        self.name = "sample picture"
         self.image = QImage(self.width,self.height, QImage.Format_RGB32)

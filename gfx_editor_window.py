@@ -7,7 +7,8 @@ from gfx_atari import *
 
 class MyGraphicsView(QGraphicsView):
     mouse_pressed = pyqtSignal(QPointF, name="mousePressed")
-    mouse_moved = pyqtSignal(QPointF, name="mousePressed")
+    mouse_moved = pyqtSignal(QPointF, name="mouseMoved")
+    mouse_released = pyqtSignal(name="mouseReleased")
 
     def showEvent(self, QShowEvent):
         self.scaleToContent()
@@ -32,12 +33,13 @@ class MyGraphicsView(QGraphicsView):
 
     def mousePressEvent(self, event):
         pt = self.mapToScene(event.pos())
-        #print("mousePressEvent event " + str(event))
+        print("mousePressEvent event " + str(event))
         #print("pt " + str(pt))
         self.mouse_pressed.emit(pt)
 
     def mouseReleaseEvent(self, event):
         print("mouseReleaseEvent event " + str(event))
+        self.mouse_released.emit()
 
     def mouseMoveEvent(self, event):
         #print("mouseMoveEvent event " + str(event))
@@ -78,8 +80,23 @@ class MyScene(QGraphicsScene):
     def __init__(self, parent):
         super().__init__(parent)
 
+class CommandModifyGfx(QUndoCommand):
+    def __init__(self, gfx, old_state):
+        super(CommandModifyGfx, self).__init__("ModifyGfx " + gfx.name)
+        self.gfx = gfx
+        self.value = gfx.getState()
+        self.old_value = old_state
+
+    def redo(self):
+        print("CommandModifyGfx::REDO")
+        self.gfx.setState(self.value)
+
+    def undo(self):
+        print("CommandModifyGfx::UNDO")
+        self.gfx.setState(self.old_value)
 
 class GfxEditorWindow(DockWindow):
+
     def resizeEvent(self, QResizeEvent):
         self.view.scaleToContent()
 
@@ -87,17 +104,18 @@ class GfxEditorWindow(DockWindow):
         self.pixmapItem.setPixmap(QPixmap.fromImage(self.gfx.toQImage()))
 
     def mousePressedHandler(self, point):
-        #print("Pixel Edit Handler " + str(point))
+        print("GETTING GFX STATE!")
+        self.old_state = self.gfx.getState()
         color_index = self.parent().paletteEditorWindow.selected_color
         self.gfx.putPixel(int(point.x()), int(point.y()),color_index)
-        self.update()
 
     def mouseMovedHandler(self, point):
-        #print("Pixel Edit Handler " + str(point))
         color_index = self.parent().paletteEditorWindow.selected_color
         self.gfx.putPixel(int(point.x()), int(point.y()),color_index)
-        self.update()
 
+    def mouseReleasedHandler(self):
+        command = CommandModifyGfx(self.gfx, self.old_state)
+        self.undoStack.push(command)
 
     def saveOnExit(self):
         if self.wasModified:
@@ -111,6 +129,7 @@ class GfxEditorWindow(DockWindow):
         #self.pixmap = QPixmap("examples/arkanoid/redrock.png")
         self.gfx = GfxIndexedTest(100, 100,2)
         palette = PlayfieldPalette()
+        self.old_state = None
         self.gfx.setPalette(palette)
         self.parent().paletteEditorWindow.setPalette(palette)
         self.pixmap = QPixmap.fromImage(self.gfx.toQImage())
@@ -119,6 +138,10 @@ class GfxEditorWindow(DockWindow):
         self.scene.addItem(self.pixmapItem)
         #self.scene.createGrid()
         self.view = MyGraphicsView(self.scene)
+        self.setWidget(self.view)
+
+        # connect slots and signalds
+        self.gfx.state_changed.connect(self.update)
         self.view.mouse_pressed.connect(self.mousePressedHandler)
         self.view.mouse_moved.connect(self.mouseMovedHandler)
-        self.setWidget(self.view)
+        self.view.mouse_released.connect(self.mouseReleasedHandler)

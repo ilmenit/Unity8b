@@ -7,6 +7,7 @@ Modes have:
 '''
 
 from abc import ABCMeta, abstractmethod
+from PyQt5.QtCore import *
 
 class Size():
     def __init__(self, x=None, y=None):
@@ -15,7 +16,10 @@ class Size():
 
 Position = Size
 
-class PaletteColorABC(metaclass=ABCMeta):
+class FinalMetaclass(pyqtWrapperType, ABCMeta):
+    pass
+
+class PaletteColorABC(metaclass=FinalMetaclass):
     @abstractmethod
     def getRGB(self, index):
         pass
@@ -31,7 +35,9 @@ class PlayfieldPalette():
     def __init__(self):
         self.x = x
 
-class GfxABC(metaclass=ABCMeta):
+class GfxABC(QObject, metaclass=FinalMetaclass):
+    state_changed = pyqtSignal(name="stateChanged")
+
     @abstractmethod
     def getPixel(self, x, y):
         pass

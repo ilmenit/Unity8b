@@ -8,5 +8,5 @@ class UndoViewWindow(DockWindow):
     def __init__(self, parent):
         super().__init__("Undo View", parent)
         self.undoView = QUndoView(self)
-        self.undoView.setGroup(parent.undoGroup)
+        self.undoView.setStack(parent.undoStack)
         self.setWidget(self.undoView)

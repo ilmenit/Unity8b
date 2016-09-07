@@ -13,7 +13,7 @@ class CommandChangeColorRegisterValue(QUndoCommand):
         self.value = value
         self.old_value = self.palette_editor_window.playfield_palette[self.register]
 
-    def changeColor(self, register, value):
+    def execute(self, register, value):
         print("CommandChangeColor")
         self.palette_editor_window.playfield_palette[register] = value
         self.palette_editor_window.frames[register].setColor(global_indexed_palette[value])
@@ -21,19 +21,16 @@ class CommandChangeColorRegisterValue(QUndoCommand):
 
     def redo(self):
         print("CommandChangeColorRegisterValue::REDO")
-        self.changeColor(self.register, self.value)
+        self.execute(self.register, self.value)
 
     def undo(self):
         print("CommandChangeColorRegisterValue::UNDO")
-        self.changeColor(self.register, self.old_value)
+        self.execute(self.register, self.old_value)
 
 class PaletteEditorWindow(DockWindow):
     color_register_picked = pyqtSignal(object, name='colorRegisterPicked')
     inform_color_picker = pyqtSignal(object, name='informColorPicker')
     palette_changed = pyqtSignal(name='paletteChanged')
-
-    def focusInEvent(self, event):
-        self.parent().activateUndoStack(self.undoStack)
 
     def colorRegisterPickedHandler(self):
         print("colorRegisterPickedHandler")

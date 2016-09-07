@@ -15,7 +15,7 @@ from console import console
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.undoGroup = QUndoGroup(self)
+        self.undoStack = QUndoStack(self)
         self.createMenuActions()
         self.createMenus()
         self.createDockWindows()
@@ -23,9 +23,6 @@ class MainWindow(QMainWindow):
         self.createStatusBar()
         self.readSettings()
         self.setWindowTitle("Unity 8b (Singularity)")
-
-    def activateUndoStack(self, undoStack):
-        self.undoGroup.setActiveStack(undoStack)
 
     def closeEvent(self, event):
         self.writeSettings()
@@ -57,7 +54,7 @@ class MainWindow(QMainWindow):
 
     def undo(self):
         print("MainWindow::UNDO")
-        self.undoGroup.undo()
+        self.undoStack.undo()
 
     def redo(self):
         print("MainWindow::REDO")
