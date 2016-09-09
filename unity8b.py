@@ -21,21 +21,6 @@ from main_window import MainWindow
 
 import unity8b_rc
 
-class Game():
-    name = "game_name"
-    game_data = {
-        "playfields": [],
-        "palettes": [],
-        "sounds": [],
-        "sprites": [],
-        "playfield_data": [],
-    }
-    def load(self):
-        pass
-
-    def save(self):
-        pass
-
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
 

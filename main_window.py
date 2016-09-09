@@ -10,11 +10,14 @@ from console_window import ConsoleWindow
 from palette_editor_window import PaletteEditorWindow
 from color_picker_window import ColorPickerWindow
 from undo_view_window import UndoViewWindow
+from assets_window import AssetsWindow
 from console import console
+from project import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.game = Project()
         self.undoStack = QUndoStack(self)
         self.createMenuActions()
         self.createMenus()
@@ -22,7 +25,8 @@ class MainWindow(QMainWindow):
         self.createToolBars()
         self.createStatusBar()
         self.readSettings()
-        self.setWindowTitle("Unity 8b (Singularity)")
+        # If Unity Tech. decide to ban it then we can always change name to sth. like "Singularity" ;-)
+        self.setWindowTitle("Unity 8b")
 
     def closeEvent(self, event):
         self.writeSettings()
@@ -63,9 +67,9 @@ class MainWindow(QMainWindow):
 
     def about(self):
         QMessageBox.about(self, "About Unity 8b",
-                "<b>Unity 8b</b> is a game development environment for 8bit computers (currently Atari 8bit).\n"
-                "It is heavily inspired by Unity 3D by Unity Technologies but is not related to work of this company.\n"
-                "Developed by Jakub 'ilmenit' Debski")
+                "<b>Unity 8b</b> is a game development environment for 8bit computers (currently Atari XL,XE, in the future: NES, C64, ZX Spectrum?).<br>"
+                "It is inspired by Unity (<a href='http://www.unity3d.com'>link</a>) by Unity Technologies but is not related to work of this company.<br>"
+                "Developed by Jakub 'ilmenit' Debski as a tribute to amazing 8bit designers of the eighties.")
 
     def createMenuActions(self):
         self.newGameAct = QAction(QIcon(':/icons/new.png'), "&New Game",
@@ -88,9 +92,16 @@ class MainWindow(QMainWindow):
         self.quitAct = QAction("&Quit", self, shortcut="Ctrl+Q",
                 statusTip="Quit the application", triggered=self.close)
 
+        self.notImplementedAct = QAction("None", self,
+                statusTip="Not implemented", triggered=self.notImplemented)
+
+
         self.aboutAct = QAction("&About", self,
                 statusTip="Show the application's About box",
                 triggered=self.about)
+
+    def notImplemented(self):
+        pass
 
     def createMenus(self):
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -103,7 +114,13 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(self.undoAct)
         self.editMenu.addAction(self.redoAct)
 
-        self.viewMenu = self.menuBar().addMenu("&View")
+        self.assetsMenu = self.menuBar().addMenu("&Assets")
+        self.createAssetsMenu = self.assetsMenu.addMenu("Create")
+        self.createAssetsPlayfield = self.createAssetsMenu.addAction(self.notImplementedAct)
+        self.createAssetsPalette = self.createAssetsMenu.addAction(self.notImplementedAct)
+        self.createAssetsTileset = self.createAssetsMenu.addAction(self.notImplementedAct)
+
+        self.windowsMenu = self.menuBar().addMenu("&Windows")
 
         self.menuBar().addSeparator()
 
@@ -131,6 +148,7 @@ class MainWindow(QMainWindow):
     def createDockWindows(self):
         self.setDockOptions(QMainWindow.AnimatedDocks | QMainWindow.AllowNestedDocks | QMainWindow.AllowTabbedDocks)
         self.sceneWindow = SceneWindow(self)
+        self.assetsWindow = AssetsWindow(self)
         self.emulatorWindow = EmuWindow(self)
         self.playfieldEditorWindow = PlayfieldEditorWindow(self)
         self.tilesetEditorWindow = TilesetEditorWindow(self)
@@ -138,7 +156,6 @@ class MainWindow(QMainWindow):
         self.paletteEditorWindow = PaletteEditorWindow(self)
         self.colorPickerWindow = ColorPickerWindow(self)
         self.gfxEditorWindow = GfxEditorWindow(self)
-
         self.colorPickerWindow.color_picked.connect(self.paletteEditorWindow.changeSelectedColorRegister)
         self.paletteEditorWindow.inform_color_picker.connect(self.colorPickerWindow.activateColor)
         self.paletteEditorWindow.palette_changed.connect(self.gfxEditorWindow.update)

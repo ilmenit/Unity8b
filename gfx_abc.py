@@ -11,32 +11,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-
-class Size():
-    def __init__(self, x=None, y=None):
-        self.x = x
-        self.y = y
-
-Position = Size
-
 class FinalMetaclass(pyqtWrapperType, ABCMeta):
     pass
-
-class PaletteColorABC(metaclass=FinalMetaclass):
-    @abstractmethod
-    def getRGB(self, index):
-        pass
-
-    @abstractmethod
-    def setRGB(self, index, rgb):
-        pass
-
-class PlayfieldPalette():
-    '''
-    Set of color registers
-    '''
-    def __init__(self):
-        self.x = x
 
 class GfxABC(QObject, metaclass=FinalMetaclass):
     state_changed = pyqtSignal(name="stateChanged")
@@ -135,11 +111,11 @@ class GridScene(QGraphicsScene):
     def createGrid(self):
         # dc.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
         penRadius = 0.10
-        pen1 = QPen(QColor(0x40, 0x40, 0x40, 0x80), penRadius*2, Qt.DotLine)
+        pen1 = QPen(QColor(0x0, 0x0, 0x0, 0x80), penRadius*2, Qt.DotLine)
         pen1.setDashPattern([1,2])
-        pen2 = QPen(QColor(0xA0, 0xA0, 0xA0, 0x80), penRadius*2, Qt.DotLine)
+        pen2 = QPen(QColor(0xF0, 0xF0, 0xF0, 0x80), penRadius*2, Qt.DotLine)
         pen2.setDashPattern([1,2])
-        pen2.setDashOffset(0);
+        pen2.setDashOffset(1)
         for x in range(int(penRadius*2), int(self.width()), self.grid_x):
             self.addLine(x - penRadius, penRadius, x - penRadius, int(self.height()), pen1)
             self.addLine(x - penRadius, penRadius, x - penRadius, int(self.height()), pen2)

@@ -7,41 +7,6 @@ from gfx_abc import *
 from indexed_palette import *
 from copy import copy
 
-class MemoryBuffer(QObject):
-    '''
-    This class provides a view on memory buffer. It may contain multiple sub-buffers that get notified when main one is changing?
-
-    should it be as bytearray or memoryview?
-    http://www.dotnetperls.com/bytes-python
-
-    data could be a passed one (memoryview) or local one (bytearray) - two different classes?
-    '''
-    data_changed = pyqtSignal(object, name='colorPicked')
-
-    def clearChanged(self):
-        self.changed = False
-
-    def NotifyObservers(self):
-        self.clearChanged()
-        self.data_changed.emit(self)
-
-    def __init__(self, parent=None, data=None, address=None):
-        super().__init__()
-        self.data = data
-        self.address = address
-        self.changed = False
-
-    def __getitem__(self, index):
-        return self.data[index]
-
-    def __setitem__(self, index, value):
-        self.changed = True
-        self.data[index] = value
-
-    def __len__(self):
-        return len(self.data)
-
-
 class GfxAnticMode4FontConfigurationWidget(QWidget):
     pass
 

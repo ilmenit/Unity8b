@@ -15,4 +15,4 @@ class DockWindow(QDockWidget):
         self.setFocusPolicy(Qt.StrongFocus)
         self.undoStack = parent.undoStack
         parent.addDockWidget(Qt.TopDockWidgetArea, self)
-        parent.viewMenu.addAction(self.toggleViewAction())
+        parent.windowsMenu.addAction(self.toggleViewAction())
