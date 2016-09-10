@@ -6,5 +6,4 @@ class Platform():
 
 class PlatformAtariXl(Platform):
     name = 'Atari 8bit XL/XE'
-    avaiable_gfx_modes = [ GfxIndexedTest, GfxAnticMode4MultipleFonts ]
-    supported_assets = [ AssetPlayfieldPalette ]
+    supported_assets = [ AssetPlayfieldPalette, GfxIndexedTest ]

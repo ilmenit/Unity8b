@@ -12,8 +12,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from asset import *
 
-class GfxABC(QObject, metaclass=FinalMetaclass):
-    state_changed = pyqtSignal(name="stateChanged")
+class GfxABC(Asset):
 
     @abstractmethod
     def getPixel(self, x, y):
@@ -26,14 +25,6 @@ class GfxABC(QObject, metaclass=FinalMetaclass):
     @abstractmethod
     def modeName(self):
         return "ModeName"
-
-    @abstractmethod
-    def getState(self):
-        pass
-
-    @abstractmethod
-    def setState(self, state):
-        pass
 
     @abstractmethod
     def toQImage(self):

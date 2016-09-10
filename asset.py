@@ -23,13 +23,14 @@ class FinalMetaclass(pyqtWrapperType, ABCMeta):
     pass
 
 class Asset(QObject, metaclass=FinalMetaclass):
+    data_changed = pyqtSignal(name="dataChanged")
 
-    type_name = "Asset Name"
     on_scene = False
     relative_path = '/'
     project = None
 
     def __init__(self, name):
+        super().__init__()
         self.name = name
 
     @classmethod
@@ -40,11 +41,6 @@ class Asset(QObject, metaclass=FinalMetaclass):
             counter += 1
             full_name = file_name + str(counter) + extension
         return full_name
-
-    @classmethod
-    @abstractmethod
-    def supportedPlatforms(cls):
-        pass
 
     @classmethod
     def createNew(cls, asset_type, name, project_path):
@@ -59,6 +55,12 @@ class Asset(QObject, metaclass=FinalMetaclass):
     @abstractmethod
     def file_extensions(cls):
         pass
+
+    @classmethod
+    @abstractmethod
+    def typeName(cls):
+        pass
+
 
     @abstractmethod
     def compile(self):
@@ -116,7 +118,7 @@ class Asset(QObject, metaclass=FinalMetaclass):
 
 class CommandChangeAsset(QUndoCommand):
     def __init__(self, asset, old_state, new_state):
-        super().__init__("[" + asset.type_name + "] " + asset.name)
+        super().__init__("[" + asset.typeName() + "] " + asset.name)
         self.asset = asset
         self.new_state = new_state
         self.old_state = old_state

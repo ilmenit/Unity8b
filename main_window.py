@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
         pass
 
     def create_new_asset(self, asset_type):
-        file_name = Asset.createNew(asset_type, asset_type.type_name, self.project.path)
+        file_name = Asset.createNew(asset_type, asset_type.typeName(), self.project.path)
         print("file name " + file_name)
         new_index = self.assetsWindow.dir_model.index(file_name)
         print("New index " + str(new_index))
@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
 
     def buildAssetsMenu(self, menu):
         for asset in self.project.platform.supported_assets:
-            action = QAction(asset.type_name, self, statusTip="Create " + asset.type_name, triggered=lambda : self.create_new_asset(asset))
+            action = QAction(asset.typeName(), self, statusTip="Create " + asset.typeName(), triggered=lambda : self.create_new_asset(asset))
             menu.addAction(action)
 
     def createMenus(self):

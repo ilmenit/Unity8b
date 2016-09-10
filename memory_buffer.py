@@ -60,8 +60,7 @@ class MemoryBuffer(QObject):
     def setState(self, state):
         if len(state) != self.size:
             raise ValueError("Assigning state of wrong size")
-        self.data = state
-        self.view = memoryview(self.data)
+        self.data[:] = state[:]
         self.notify(0, self.size)
 
 

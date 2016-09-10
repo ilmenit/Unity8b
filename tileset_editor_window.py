@@ -43,7 +43,7 @@ class TilesetWidget(QWidget):
         self.setLayout(mainVLayout)
 
         # connect slots and signalds
-        self.gfx.state_changed.connect(self.update)
+        self.gfx.data_changed.connect(self.update)
         #self.view.mouse_pressed.connect(self.mousePressedHandler)
         #self.view.mouse_moved.connect(self.mouseMovedHandler)
         #self.view.mouse_released.connect(self.mouseReleasedHandler)

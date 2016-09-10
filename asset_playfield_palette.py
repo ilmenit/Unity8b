@@ -12,7 +12,6 @@ class AssetPlayfieldPalette(Asset):
     '''
     Playfield palette is an array of color
     '''
-    type_name = "Playfield Palette"
 
     def __init__(self, name, memory_view = None):
         super().__init__(name)
@@ -20,16 +19,17 @@ class AssetPlayfieldPalette(Asset):
             self.data = MemoryBuffer(5)
             for i in range(len(self.data)):
                 self.data[i] = i * 16 + 5
+            self.data.data_changed.connect(super().data_changed)
         else:
             self.setState(memory_view)
 
     @classmethod
-    def supportedPlatforms(cls):
-        return [ PlatformAtariXl ]
-
-    @classmethod
     def file_extensions(cls):
         return [ '.pal' ]
+
+    @classmethod
+    def typeName(cls):
+        return "Playfield Palette"
 
     def compile(self):
         print("PlayfieldPalette::compile")
@@ -41,7 +41,7 @@ class AssetPlayfieldPalette(Asset):
 
     def openInEditor(self):
         print("PlayfieldPalette::openInEditor")
-        singletons.main_window.paletteEditorWindow.setPalette(self)
+        singletons.main_window.gfxEditorWindow.set(self)
 
     def moveToAssets(self):
         print("PlayfieldPalette::moveToAssets")

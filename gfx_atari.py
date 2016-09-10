@@ -7,47 +7,39 @@ from gfx_abc import *
 from indexed_palette import *
 from copy import copy
 from memory_buffer import *
+from asset import *
 
-class GfxAnticMode4FontConfigurationWidget(QWidget):
-    pass
+class GfxIndexedTest(GfxABC):
 
-class GfxAnticMode4MultipleFonts(GfxABC):
-    def getPixel(self, x, y):
-        return 0
+    @classmethod
+    def typeName(cls):
+        return "Indexed Gfx Test"
 
-    def putPixel(self, x, y, color_register_index):
-        pass
+    def compile(self):
+        raise NotImplementedError()
 
-    def modeName(self):
-        return "Tiled, 128*2 tiles, 4+1 colors"
+    @classmethod
+    def file_extensions(cls):
+        return [ '.mic' ]
 
-    def initFromMemory(self):
-        pass
+    def moveToAssets(self):
+        raise NotImplementedError()
 
-    def initLocally(self):
-        pass
+    def openInEditor(self):
+        singletons.main_window.gfxEditorWindow.setGfx(self)
+        raise NotImplementedError()
 
-    def toQImage(self):
-        image = QImage(self.width,self.height, QImage.Format_RGB32)
-        for y in range(self.height):
-            for x in range(self.width):
-                register_index = self.getPixel(x,y)
-                color_value = self.color_registers[register_index]
-                rgb_color = global_indexed_palette[color_value]
-                image.setPixel(x,y,rgb_color.rgb())
-        return image
+    def placeOnScene(self):
+        raise NotImplementedError()
 
-    def __init__(self, width, height):
-        super().__init__()
-        self.color_registers = PlayfieldPalette()
+    def __init__(self, name, width=4, height=8, pixel_width_ration=2):
+        super().__init__(name=name)
+        self.memory_buffer = bytearray(width * height)
+        self.pixel_width_ration = pixel_width_ration
         self.width = width
         self.height = height
-        self.fonts = list()
-        self.fonts.append(MemoryBuffer(1024))
-        self.fonts.append(MemoryBuffer(1024))
-
-
-class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
+        self.name = "sample picture"
+        self.image = QImage(self.width,self.height, QImage.Format_RGB32)
 
     def getPixel(self, x, y):
         if x<0 or x>=self.width or y<0 or y>=self.height:
@@ -60,7 +52,7 @@ class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
         if x<0 or x>=self.width or y<0 or y>=self.height:
             return
         self.memory_buffer[y * self.width + x] = color_register_index
-        self.state_changed.emit()
+        self.data_changed.emit()
 
     def modeName(self):
         return "SimpleIndexed"
@@ -70,15 +62,14 @@ class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
 
     def setState(self, state):
         self.memory_buffer = copy(state)
-        self.state_changed.emit()
+        self.data_changed.emit()
 
     def toQImage(self):
         image = QImage(self.width,self.height, QImage.Format_RGB32)
-        palette_data = self.playfield_palette.getState()
         for y in range(self.height):
             for x in range(self.width):
                 register_index = self.getPixel(x,y)
-                color_value = palette_data[register_index]
+                color_value = self.playfield_palette.data[register_index]
                 rgb_color = global_indexed_palette[color_value]
                 image.setPixel(x,y,rgb_color.rgb())
 
@@ -87,13 +78,5 @@ class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
 
     def setPalette(self, palette):
         self.playfield_palette = palette
-        self.playfield_palette.data.dataChanged.connect(self.state_changed)
+        self.playfield_palette.dataChanged.connect(self.data_changed)
 
-    def __init__(self, width, height, pixel_width_ration=1):
-        super().__init__()
-        self.memory_buffer = bytearray(width * height)
-        self.pixel_width_ration = pixel_width_ration
-        self.width = width
-        self.height = height
-        self.name = "sample picture"
-        self.image = QImage(self.width,self.height, QImage.Format_RGB32)
