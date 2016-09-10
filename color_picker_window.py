@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from dock_window import DockWindow
 from custom_widgets import *
 from indexed_palette import *
+from playfield_palette import *
 
 class ColorPickerWindow(DockWindow):
     color_picked = pyqtSignal(object, name='colorPicked')
@@ -42,7 +43,7 @@ class ColorPickerWindow(DockWindow):
 
     def __init__(self, parent):
         super().__init__("Color picker", parent)
-        palette_file = "examples/arkanoid/laoo.act"
+        palette_file = "palettes/laoo.act"
         self.palette = IndexedPalette(palette_file)
         self.color_registers = PlayfieldPalette()
         self.frames = dict()

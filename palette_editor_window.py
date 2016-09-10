@@ -5,28 +5,6 @@ from dock_window import DockWindow
 from custom_widgets import *
 from indexed_palette import *
 
-class CommandChangeColorRegisterValue(QUndoCommand):
-    def __init__(self, palette_editor_window, register, value):
-        super(CommandChangeColorRegisterValue, self).__init__("ChangeColorRegisterValue " + str(register) + "=" + str(value))
-        self.palette_editor_window = palette_editor_window
-        self.register = register
-        self.value = value
-        self.old_value = self.palette_editor_window.playfield_palette[self.register]
-
-    def execute(self, register, value):
-        print("CommandChangeColor")
-        self.palette_editor_window.playfield_palette[register] = value
-        self.palette_editor_window.frames[register].setColor(global_indexed_palette[value])
-        self.palette_editor_window.palette_changed.emit()
-
-    def redo(self):
-        print("CommandChangeColorRegisterValue::REDO")
-        self.execute(self.register, self.value)
-
-    def undo(self):
-        print("CommandChangeColorRegisterValue::UNDO")
-        self.execute(self.register, self.old_value)
-
 class PaletteEditorWindow(DockWindow):
     color_register_picked = pyqtSignal(object, name='colorRegisterPicked')
     inform_color_picker = pyqtSignal(object, name='informColorPicker')
@@ -69,8 +47,8 @@ class PaletteEditorWindow(DockWindow):
         gridLayout.setVerticalSpacing(0)
         gridLayout.setHorizontalSpacing(0)
 
-        for i in range(len(self.playfield_palette)):
-            value = self.playfield_palette[i]
+        for i in range(len(self.playfield_palette.data)):
+            value = self.playfield_palette.data[i]
             print(str(i) + " value " + str(value))
             y = int(i / 16)
             x = i % 16

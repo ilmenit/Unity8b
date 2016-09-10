@@ -1,24 +1,21 @@
 from memory_buffer import *
 from gfx_atari import *
-
-class Platform():
-    name = "Platform name"
-
-class PlatformAtariXl(Platform):
-    name = 'Atari 8bit XL/XE'
-    avaiable_gfx_modes = [ GfxIndexedTest, GfxAnticMode4MultipleFonts ]
+from project_platform import *
 
 class Project():
-    main_memory = MemoryBuffer(65536)
-    project_path = 'examples/arkanoid'
-    name = "game_name"
-    game_data = {
-        "playfields": [],
-        "palettes": [],
-        "sounds": [],
-        "sprites": [],
-        "playfield_data": [],
-    }
+    def __init__(self, name):
+        self.main_memory = MemoryBuffer(65536)
+        self.path = 'examples/arkanoid'
+        self.name = name
+        self.platform = PlatformAtariXl()
+        self.assets = Assets(self.platform)
+        self.game_data = {
+            "playfields": [],
+            "palettes": [],
+            "sounds": [],
+            "sprites": [],
+            "playfield_data": [],
+        }
     def load(self):
         pass
 

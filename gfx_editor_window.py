@@ -2,8 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from dock_window import DockWindow
-import gfx_abc
 from gfx_atari import *
+from playfield_palette import *
 
 class CommandModifyGfx(QUndoCommand):
     def __init__(self, gfx, old_state):

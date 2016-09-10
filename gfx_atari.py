@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from gfx_abc import *
 from indexed_palette import *
 from copy import copy
+from memory_buffer import *
 
 class GfxAnticMode4FontConfigurationWidget(QWidget):
     pass
@@ -73,10 +74,11 @@ class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
 
     def toQImage(self):
         image = QImage(self.width,self.height, QImage.Format_RGB32)
+        palette_data = self.playfield_palette.getState()
         for y in range(self.height):
             for x in range(self.width):
                 register_index = self.getPixel(x,y)
-                color_value = self.playfield_palette[register_index]
+                color_value = palette_data[register_index]
                 rgb_color = global_indexed_palette[color_value]
                 image.setPixel(x,y,rgb_color.rgb())
 

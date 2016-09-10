@@ -20,7 +20,7 @@ class AssetsWindow(DockWindow):
 
         self.dir_view = QTreeView()
         self.dir_view.setModel(self.dir_model)
-        root = self.dir_model.setRootPath(parent.game.project_path)
+        root = self.dir_model.setRootPath(parent.project.path)
         self.dir_view.setRootIndex(root)
         self.dir_view.setSortingEnabled(True)
         self.dir_view.sortByColumn(0, Qt.AscendingOrder)

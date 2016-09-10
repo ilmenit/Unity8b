@@ -13,11 +13,12 @@ from undo_view_window import UndoViewWindow
 from assets_window import AssetsWindow
 from console import console
 from project import *
+from project import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.game = Project()
+        self.project = Project("Test project")
         self.undoStack = QUndoStack(self)
         self.createMenuActions()
         self.createMenus()
@@ -103,7 +104,20 @@ class MainWindow(QMainWindow):
     def notImplemented(self):
         pass
 
+    def create_new_asset(self, asset_type):
+        file_name = Asset.createNew(asset_type, asset_type.type_name, self.project.path)
+        print("file name " + file_name)
+        new_index = self.assetsWindow.dir_model.index(file_name)
+        print("New index " + str(new_index))
+        self.assetsWindow.dir_view.setCurrentIndex(new_index)
+
+    def buildAssetsMenu(self, menu):
+        for asset in self.project.platform.supported_assets:
+            action = QAction(asset.type_name, self, statusTip="Create " + asset.type_name, triggered=lambda : self.create_new_asset(asset))
+            menu.addAction(action)
+
     def createMenus(self):
+
         self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.newGameAct)
         self.fileMenu.addAction(self.saveAct)
@@ -116,9 +130,7 @@ class MainWindow(QMainWindow):
 
         self.assetsMenu = self.menuBar().addMenu("&Assets")
         self.createAssetsMenu = self.assetsMenu.addMenu("Create")
-        self.createAssetsPlayfield = self.createAssetsMenu.addAction(self.notImplementedAct)
-        self.createAssetsPalette = self.createAssetsMenu.addAction(self.notImplementedAct)
-        self.createAssetsTileset = self.createAssetsMenu.addAction(self.notImplementedAct)
+        self.buildAssetsMenu(self.createAssetsMenu)
 
         self.windowsMenu = self.menuBar().addMenu("&Windows")
 

@@ -8,6 +8,7 @@ from dock_window import DockWindow
 from console import console
 import gfx_abc
 from gfx_atari import *
+from playfield_palette import *
 
 default_tileset = {
     # "file_name" : "default.fnt",

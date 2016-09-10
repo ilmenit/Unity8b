@@ -10,9 +10,7 @@ from abc import ABCMeta, abstractmethod
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
-class FinalMetaclass(pyqtWrapperType, ABCMeta):
-    pass
+from asset import *
 
 class GfxABC(QObject, metaclass=FinalMetaclass):
     state_changed = pyqtSignal(name="stateChanged")
