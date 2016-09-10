@@ -5,15 +5,17 @@ from collections.abc import Sequence
 from collections import OrderedDict
 from asset import *
 from memory_buffer import *
+from singletons import main_window
+import singletons
 
-class PlayfieldPalette(Asset):
+class AssetPlayfieldPalette(Asset):
     '''
     Playfield palette is an array of color
     '''
     type_name = "Playfield Palette"
 
-    def __init__(self, memory_view = None):
-        super().__init__()
+    def __init__(self, name, memory_view = None):
+        super().__init__(name)
         if memory_view is None:
             self.data = MemoryBuffer(5)
             for i in range(len(self.data)):
@@ -27,7 +29,7 @@ class PlayfieldPalette(Asset):
 
     @classmethod
     def file_extensions(cls):
-        return [ 'pal' ]
+        return [ '.pal' ]
 
     def compile(self):
         print("PlayfieldPalette::compile")
@@ -39,7 +41,7 @@ class PlayfieldPalette(Asset):
 
     def openInEditor(self):
         print("PlayfieldPalette::openInEditor")
-        pass
+        singletons.main_window.paletteEditorWindow.setPalette(self)
 
     def moveToAssets(self):
         print("PlayfieldPalette::moveToAssets")

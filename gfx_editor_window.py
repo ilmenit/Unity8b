@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from dock_window import DockWindow
 from gfx_atari import *
-from playfield_palette import *
+from asset_playfield_palette import *
 
 class CommandModifyGfx(QUndoCommand):
     def __init__(self, gfx, old_state):
@@ -51,7 +51,7 @@ class GfxEditorWindow(DockWindow):
     def __init__(self, parent):
         super().__init__("GfxEditor", parent)
         self.gfx = GfxIndexedTest(4, 8, 2)
-        palette = PlayfieldPalette()
+        palette = AssetPlayfieldPalette('GfxEditor')
         self.old_state = None
         self.gfx.setPalette(palette)
         self.parent().paletteEditorWindow.setPalette(palette)

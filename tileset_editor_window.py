@@ -8,7 +8,7 @@ from dock_window import DockWindow
 from console import console
 import gfx_abc
 from gfx_atari import *
-from playfield_palette import *
+from asset_playfield_palette import *
 
 default_tileset = {
     # "file_name" : "default.fnt",
@@ -28,7 +28,7 @@ class TilesetWidget(QWidget):
     def __init__(self,parent):
         super().__init__(parent)
         self.gfx = GfxIndexedTest(128*8, 8*3, 1)
-        palette = PlayfieldPalette()
+        palette = AssetPlayfieldPalette("test")
         self.old_state = None
         self.gfx.setPalette(palette)
         self.pixmap = QPixmap.fromImage(self.gfx.toQImage())

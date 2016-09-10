@@ -2,12 +2,20 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from dock_window import *
-
+from asset import *
+from console import *
 class AssetsWindow(DockWindow):
 
     def dirViewClicked(self, index):
-        path = self.dir_model.fileInfo(index).absoluteFilePath()
+        path = self.dir_model.fileInfo(index).filePath()
+        dir = QDir(self.dir_model.rootPath())
+        path = dir.relativeFilePath(path)
         print("Double Clicked " + str(path))
+        asset = self.parent().assets.load_file(path)
+        if asset is None:
+            console.error("Cannot load asset: " + path)
+        else:
+            asset.openInEditor()
 
     def loadFileHandler(self, file_name):
         print("Loading file " + file_name)

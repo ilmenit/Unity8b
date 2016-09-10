@@ -14,11 +14,14 @@ from assets_window import AssetsWindow
 from console import console
 from project import *
 from project import *
+import singletons
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        singletons.main_window = self
         self.project = Project("Test project")
+        self.assets = Assets()
         self.undoStack = QUndoStack(self)
         self.createMenuActions()
         self.createMenus()
@@ -110,6 +113,7 @@ class MainWindow(QMainWindow):
         new_index = self.assetsWindow.dir_model.index(file_name)
         print("New index " + str(new_index))
         self.assetsWindow.dir_view.setCurrentIndex(new_index)
+        self.assetsWindow.show()
 
     def buildAssetsMenu(self, menu):
         for asset in self.project.platform.supported_assets:

@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import *
 from console import *
 import pickle
 import os
+import singletons
 
 class FinalMetaclass(pyqtWrapperType, ABCMeta):
     pass
@@ -24,9 +25,12 @@ class FinalMetaclass(pyqtWrapperType, ABCMeta):
 class Asset(QObject, metaclass=FinalMetaclass):
 
     type_name = "Asset Name"
-    onScene = False
-    file_name = ''
-    relativePath = '/'
+    on_scene = False
+    relative_path = '/'
+    project = None
+
+    def __init__(self, name):
+        self.name = name
 
     @classmethod
     def make_new_name(cls, file_name, extension):
@@ -66,6 +70,9 @@ class Asset(QObject, metaclass=FinalMetaclass):
 
     @abstractmethod
     def openInEditor(self):
+        '''
+        Open the asset in internal or external editor
+        '''
         pass
 
     @abstractmethod
@@ -81,29 +88,29 @@ class Asset(QObject, metaclass=FinalMetaclass):
         pass
 
     def load_from_file(self, file_name):
-        self.file_name = file_name
-        f = open(self.file_name, 'rb')
+        self.name = file_name
+        f = open(self.name, 'rb')
         if not f:
             console.error("Cannot open file for reading " + self.ile_name)
             return
         try:
             state = pickle.load(f)
         except:
-            console.error("Cannot load file " + self.file_name)
+            console.error("Cannot load file " + self.name)
             return
         self.setState(state)
 
     def save_to_file(self, file_name):
-        self.file_name = file_name
+        self.name = file_name
         state = self.getState()
-        f = open(self.file_name, 'wb')
+        f = open(self.name, 'wb')
         if not f:
-            console.error("Cannot open file for writing " + self.file_name)
+            console.error("Cannot open file for writing " + self.name)
             return
         try:
             pickle.dump(state, f)
         except:
-            console.error("Cannot save file " + self.file_name)
+            console.error("Cannot save file " + self.name)
             return
 
 
@@ -124,16 +131,16 @@ class CommandChangeAsset(QUndoCommand):
 
 
 class Assets():
+
     def init_file_extensions(self):
-        for asset in self.platform.supported_assets:
+        for asset in singletons.main_window.project.platform.supported_assets:
             for extension in asset.file_extensions():
                 if extension in self.extension_mapping:
                     console.error("Extension " + str(extension) + " is already assigned to " + repr(self.extension_mapping[extension]))
                 else:
                     self.extension_mapping[extension.lower()] = asset
 
-    def __init__(self, project_platform):
-        self.platform = project_platform
+    def __init__(self):
         self.extension_mapping = dict()
         self.init_file_extensions()
 
@@ -141,7 +148,7 @@ class Assets():
         extension = os.path.splitext(file_name)[1].lower()
         if extension in self.extension_mapping:
             asset_class = self.extension_mapping[extension]
-            asset_instance = asset_class()
+            asset_instance = asset_class(file_name)
             return asset_instance
         return None
 

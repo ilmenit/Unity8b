@@ -8,7 +8,6 @@ class Project():
         self.path = 'examples/arkanoid'
         self.name = name
         self.platform = PlatformAtariXl()
-        self.assets = Assets(self.platform)
         self.game_data = {
             "playfields": [],
             "palettes": [],

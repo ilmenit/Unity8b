@@ -16,9 +16,7 @@ import qdarkstyle
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
 from main_window import MainWindow
-
 import unity8b_rc
 
 def except_hook(cls, exception, traceback):
@@ -34,6 +32,6 @@ if __name__ == '__main__':
 
     # setup stylesheet
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-    mainWin = MainWindow()
-    mainWin.show()
+    mainWindow = MainWindow()
+    mainWindow.show()
     sys.exit(app.exec_())

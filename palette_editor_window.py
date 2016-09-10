@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from dock_window import DockWindow
 from custom_widgets import *
 from indexed_palette import *
+from asset import *
 
 class PaletteEditorWindow(DockWindow):
     color_register_picked = pyqtSignal(object, name='colorRegisterPicked')
@@ -27,7 +28,10 @@ class PaletteEditorWindow(DockWindow):
 
     def changeColorRegister(self, register, value):
         print("changeColorRegister")
-        self.undoStack.push(CommandChangeColorRegisterValue(self, register, value))
+        old_state = self.playfield_palette.getState()
+        self.playfield_palette.data[register] = value
+        new_state = self.playfield_palette.getState()
+        self.undoStack.push(CommandChangeAsset(self.playfield_palette, old_state, new_state))
 
     def changeSelectedColorRegister(self, value):
         self.changeColorRegister(self.selected_color, value)
@@ -39,7 +43,7 @@ class PaletteEditorWindow(DockWindow):
         self.mainWidget = QWidget(self)
 
         verticalLayout = QVBoxLayout()
-        self.paletteNameLabel = QLabel("<< Palette name here >>")
+        self.paletteNameLabel = QLabel(self.playfield_palette.name)
         verticalLayout.addWidget(self.paletteNameLabel)
         gridLayout = QGridLayout()
         verticalLayout.addLayout(gridLayout)
