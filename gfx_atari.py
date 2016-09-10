@@ -87,6 +87,7 @@ class GfxIndexedTest(GfxABC, metaclass=FinalMetaclass):
 
     def setPalette(self, palette):
         self.playfield_palette = palette
+        self.playfield_palette.data.dataChanged.connect(self.state_changed)
 
     def __init__(self, width, height, pixel_width_ration=1):
         super().__init__()

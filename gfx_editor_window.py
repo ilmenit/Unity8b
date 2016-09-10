@@ -25,7 +25,7 @@ class GfxEditorWindow(DockWindow):
     def resizeEvent(self, QResizeEvent):
         self.view.scaleToContent()
 
-    def update(self):
+    def dataChangedHandler(self):
         self.pixmapItem.setPixmap(QPixmap.fromImage(self.gfx.toQImage()))
 
     def mousePressedHandler(self, point):
@@ -64,7 +64,7 @@ class GfxEditorWindow(DockWindow):
         self.setWidget(self.view)
 
         # connect slots and signalds
-        self.gfx.state_changed.connect(self.update)
+        self.gfx.state_changed.connect(self.dataChangedHandler)
         self.view.mouse_pressed.connect(self.mousePressedHandler)
         self.view.mouse_moved.connect(self.mouseMovedHandler)
         self.view.mouse_released.connect(self.mouseReleasedHandler)

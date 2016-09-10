@@ -34,11 +34,11 @@ class Asset(QObject, metaclass=FinalMetaclass):
 
     @classmethod
     def make_new_name(cls, file_name, extension):
-        full_name = file_name + '.' + extension
+        full_name = file_name + extension
         counter = 0
         while os.path.exists(full_name):
             counter += 1
-            full_name = file_name + str(counter) + '.' + extension
+            full_name = file_name + str(counter) + extension
         return full_name
 
     @classmethod
@@ -50,8 +50,8 @@ class Asset(QObject, metaclass=FinalMetaclass):
     def createNew(cls, asset_type, name, project_path):
         file_name = os.path.join(project_path,"New " + name)
         extension = asset_type.file_extensions()[0]
-        new_asset = asset_type()
         new_name = cls.make_new_name(file_name,extension)
+        new_asset = asset_type(new_name)
         new_asset.save_to_file(new_name)
         return new_name
 
@@ -116,17 +116,19 @@ class Asset(QObject, metaclass=FinalMetaclass):
 
 class CommandChangeAsset(QUndoCommand):
     def __init__(self, asset, old_state, new_state):
-        super().__init__("Change " + asset.name)
+        super().__init__("[" + asset.type_name + "] " + asset.name)
         self.asset = asset
         self.new_state = new_state
         self.old_state = old_state
 
     def redo(self):
-        print("CommandChangeAsset::REDO " + self.asset.name)
+        #print("CommandChangeAsset::REDO " + self.asset.name)
+        #print(str(self.new_state))
         self.asset.setState(self.new_state)
 
     def undo(self):
-        print("CommandChangeAsset::UNDO " + self.asset.name)
+        #print("CommandChangeAsset::UNDO " + self.asset.name)
+        #print(str(self.old_state))
         self.asset.setState(self.old_state)
 
 

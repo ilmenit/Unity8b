@@ -10,7 +10,7 @@ class ColorPickerWindow(DockWindow):
     color_picked = pyqtSignal(object, name='colorPicked')
 
     def activateColor(self, color_index):
-        print("ColorPickerWindow::activateColor " + str(color_index))
+        #print("ColorPickerWindow::activateColor " + str(color_index))
         if color_index not in self.frames:
             return
         if self.selectedColor is not None:
@@ -19,6 +19,7 @@ class ColorPickerWindow(DockWindow):
         self.frames[self.selectedColor].activate()
 
     def colorPickedHandler(self):
+        #print("colorPickedHandler")
         sender = self.sender()
         self.activateColor(sender.key)
 

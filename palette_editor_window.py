@@ -5,6 +5,7 @@ from dock_window import DockWindow
 from custom_widgets import *
 from indexed_palette import *
 from asset import *
+from copy import copy
 
 class PaletteEditorWindow(DockWindow):
     color_register_picked = pyqtSignal(object, name='colorRegisterPicked')
@@ -13,9 +14,9 @@ class PaletteEditorWindow(DockWindow):
 
     def colorRegisterPickedHandler(self):
         print("colorRegisterPickedHandler")
-        sender = self.sender()
-        self.activateColorRegister(sender.key)
-        self.inform_color_picker.emit(self.playfield_palette[self.selected_color])
+        register = self.sender().key
+        self.activateColorRegister(register)
+        self.inform_color_picker.emit(self.playfield_palette.data[self.selected_color])
 
     def activateColorRegister(self, register):
         print("Activating : " + str(register))
@@ -27,10 +28,10 @@ class PaletteEditorWindow(DockWindow):
         self.frames[self.selected_color].activate()
 
     def changeColorRegister(self, register, value):
-        print("changeColorRegister")
+        print("changeColorRegister " + str(register) + " to " + str(value))
         old_state = self.playfield_palette.getState()
-        self.playfield_palette.data[register] = value
-        new_state = self.playfield_palette.getState()
+        new_state = copy(old_state)
+        new_state[register] = value
         self.undoStack.push(CommandChangeAsset(self.playfield_palette, old_state, new_state))
 
     def changeSelectedColorRegister(self, value):
@@ -53,7 +54,7 @@ class PaletteEditorWindow(DockWindow):
 
         for i in range(len(self.playfield_palette.data)):
             value = self.playfield_palette.data[i]
-            print(str(i) + " value " + str(value))
+            #print(str(i) + " value " + str(value))
             y = int(i / 16)
             x = i % 16
             colorButton = ColorFrame(self, i)
@@ -72,7 +73,14 @@ class PaletteEditorWindow(DockWindow):
 
     def setPalette(self, palette):
         self.playfield_palette = palette
+        self.playfield_palette.data.dataChanged.connect(self.dataChangedHandler)
         self.createWidget()
+
+    def dataChangedHandler(self):
+        #print("PALETTE DATA CHANGED")
+        for i in range(len(self.playfield_palette.data)):
+            value = self.playfield_palette.data[i]
+            self.frames[i].setColor(global_indexed_palette[value])
 
     def __init__(self, parent):
         super().__init__("Palette", parent)
