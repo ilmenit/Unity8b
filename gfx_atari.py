@@ -18,28 +18,28 @@ class GfxIndexedTest(GfxABC):
     def compile(self):
         raise NotImplementedError()
 
+    def createEmptyState(self):
+        self.width = 4
+        self.height = 8
+        self.pixel_width_ration = 2
+        self.memory_buffer = bytearray(self.width * self.height)
+        #self.name = "sample picture"
+        #self.image = QImage(self.width,self.height, QImage.Format_RGB32)
+        return self.memory_buffer
+
     @classmethod
-    def file_extensions(cls):
+    def fileExtensions(cls):
         return [ '.mic' ]
 
     def moveToAssets(self):
         raise NotImplementedError()
 
     def openInEditor(self):
-        singletons.main_window.gfxEditorWindow.setGfx(self)
+        singletons.main_window.gfxEditorWindow.setAsset(self)
         raise NotImplementedError()
 
     def placeOnScene(self):
         raise NotImplementedError()
-
-    def __init__(self, name, width=4, height=8, pixel_width_ration=2):
-        super().__init__(name=name)
-        self.memory_buffer = bytearray(width * height)
-        self.pixel_width_ration = pixel_width_ration
-        self.width = width
-        self.height = height
-        self.name = "sample picture"
-        self.image = QImage(self.width,self.height, QImage.Format_RGB32)
 
     def getPixel(self, x, y):
         if x<0 or x>=self.width or y<0 or y>=self.height:

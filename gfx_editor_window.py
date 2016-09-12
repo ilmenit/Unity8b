@@ -6,7 +6,10 @@ from gfx_atari import *
 from asset_playfield_palette import *
 from asset import *
 
-class GfxEditorWindow(DockWindow):
+class GfxEditorWindow(AssetEditorWindow):
+
+    def windowName(self):
+        return "Gfx Editor"
 
     def resizeEvent(self, QResizeEvent):
         if self.gfx is not None:
@@ -35,12 +38,12 @@ class GfxEditorWindow(DockWindow):
                                      "The graphics has been modified. Do you want to store it?", QMessageBox.Yes |
                                      QMessageBox.No, QMessageBox.No)
 
-    def setGfx(self, gfx):
+    def setAsset(self, asset):
         print("GfxEditorWindow::setGfx")
         if self.gfx is not None:
             self.gfx.data_changed.disconnect(self.dataChangedHandler)
-        self.gfx = gfx
-        if gfx is not None:
+        self.gfx = asset
+        if asset is not None:
             self.pixmap = QPixmap.fromImage(self.gfx.toQImage())
             self.scene = GridScene(self, self.gfx.width,self.gfx.height, self.gfx.pixel_width_ration)
             self.pixmapItem = QGraphicsPixmapItem(self.pixmap)
@@ -61,8 +64,8 @@ class GfxEditorWindow(DockWindow):
 
 
     def __init__(self, parent):
-        super().__init__("GfxEditor", parent)
+        super().__init__(parent)
         self.gfx = None
         self.old_state = None
-        self.setGfx(None)
+        self.setAsset(None)
 

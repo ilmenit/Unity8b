@@ -15,6 +15,7 @@ from console import console
 from project import *
 from project import *
 import singletons
+from utils import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -108,16 +109,25 @@ class MainWindow(QMainWindow):
         pass
 
     def create_new_asset(self, asset_type):
-        file_name = Asset.createNew(asset_type, asset_type.typeName(), self.project.path)
+        print("create_new_asset " + str(asset_type))
+        file_name = Asset.createAsNewFile(asset_type, asset_type.typeName(), self.project.path)
         print("file name " + file_name)
         new_index = self.assetsWindow.dir_model.index(file_name)
         print("New index " + str(new_index))
         self.assetsWindow.dir_view.setCurrentIndex(new_index)
         self.assetsWindow.show()
 
+    @trace
     def buildAssetsMenu(self, menu):
+        #inspect_call_args()
+
         for asset in self.project.platform.supported_assets:
-            action = QAction(asset.typeName(), self, statusTip="Create " + asset.typeName(), triggered=lambda : self.create_new_asset(asset))
+            # binding is needed to make lambda work in loop properly explenation:
+            # https://blog.mister-muffin.de/2011/08/14/python-for-loop-scope-and-nested-functions/
+            # or http://stackoverflow.com/questions/19837486/python-lambda-in-a-loop
+            def bind(x):
+                return lambda: self.create_new_asset(x)
+            action = QAction(asset.typeName(), self, statusTip="Create " + asset.typeName(), triggered=bind(asset))
             menu.addAction(action)
 
     def createMenus(self):
@@ -174,7 +184,7 @@ class MainWindow(QMainWindow):
         self.gfxEditorWindow = GfxEditorWindow(self)
         self.colorPickerWindow.color_picked.connect(self.paletteEditorWindow.changeSelectedColorRegister)
         self.paletteEditorWindow.inform_color_picker.connect(self.colorPickerWindow.activateColor)
-        self.paletteEditorWindow.palette_changed.connect(self.gfxEditorWindow.update)
+        self.paletteEditorWindow.data_changed.connect(self.gfxEditorWindow.update)
         self.undoViewWindow = UndoViewWindow(self)
 
         console.init(self.consoleWindow)

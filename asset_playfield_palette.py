@@ -7,24 +7,22 @@ from asset import *
 from memory_buffer import *
 from singletons import main_window
 import singletons
+from utils import *
 
 class AssetPlayfieldPalette(Asset):
     '''
     Playfield palette is an array of color
     '''
 
-    def __init__(self, name, memory_view = None):
-        super().__init__(name)
-        if memory_view is None:
-            self.data = MemoryBuffer(5)
-            for i in range(len(self.data)):
-                self.data[i] = i * 16 + 5
-            self.data.data_changed.connect(super().data_changed)
-        else:
-            self.setState(memory_view)
+    data = None
+
+    @trace
+    def __init__(self, name, state=None, is_file=False, on_scene=False):
+        inspect_call_args()
+        super().__init__(name,state,is_file,on_scene)
 
     @classmethod
-    def file_extensions(cls):
+    def fileExtensions(cls):
         return [ '.pal' ]
 
     @classmethod
@@ -35,13 +33,21 @@ class AssetPlayfieldPalette(Asset):
         print("PlayfieldPalette::compile")
         pass
 
+    @classmethod
+    def createEmptyState(cls):
+        print("PlayfieldPalette::createEmptyState")
+        state = MemoryBuffer(5)
+        for i in range(len(state)):
+            state[i] = i * 16 +5
+        return state
+
     def placeOnScene(self):
         print("PlayfieldPalette::placeOnScene")
         pass
 
     def openInEditor(self):
         print("PlayfieldPalette::openInEditor")
-        singletons.main_window.gfxEditorWindow.set(self)
+        singletons.main_window.paletteEditorWindow.setAsset(self)
 
     def moveToAssets(self):
         print("PlayfieldPalette::moveToAssets")
