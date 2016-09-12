@@ -17,9 +17,9 @@ class AssetPlayfieldPalette(Asset):
     data = None
 
     @trace
-    def __init__(self, name, state=None, is_file=False, on_scene=False):
-        inspect_call_args()
+    def __init__(self, name, state, is_file=False, on_scene=False):
         super().__init__(name,state,is_file,on_scene)
+
 
     @classmethod
     def fileExtensions(cls):
@@ -33,9 +33,9 @@ class AssetPlayfieldPalette(Asset):
         print("PlayfieldPalette::compile")
         pass
 
+    @trace
     @classmethod
     def createEmptyState(cls):
-        print("PlayfieldPalette::createEmptyState")
         state = MemoryBuffer(5)
         for i in range(len(state)):
             state[i] = i * 16 +5
@@ -57,8 +57,10 @@ class AssetPlayfieldPalette(Asset):
         print("PlayfieldPalette::getState")
         return self.data.getState()
 
+    @trace
     def setState(self, state):
-        print("PlayfieldPalette::setState")
+        if self.data is None:
+            self.data = self.createEmptyState()
         return self.data.setState(state)
 
 from project_platform import *

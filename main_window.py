@@ -51,8 +51,8 @@ class MainWindow(QMainWindow):
         settings.setValue("geometry", self.saveGeometry());
         settings.setValue("windowState", self.saveState());
 
+    @trace
     def newGame(self):
-        print("newGame")
         reply = QMessageBox.question(self, 'Message',
                                            "Sample Message", QMessageBox.Yes |
                                            QMessageBox.No, QMessageBox.No)
@@ -108,8 +108,8 @@ class MainWindow(QMainWindow):
     def notImplemented(self):
         pass
 
+    @trace
     def create_new_asset(self, asset_type):
-        print("create_new_asset " + str(asset_type))
         file_name = Asset.createAsNewFile(asset_type, asset_type.typeName(), self.project.path)
         print("file name " + file_name)
         new_index = self.assetsWindow.dir_model.index(file_name)
@@ -119,7 +119,6 @@ class MainWindow(QMainWindow):
 
     @trace
     def buildAssetsMenu(self, menu):
-        #inspect_call_args()
 
         for asset in self.project.platform.supported_assets:
             # binding is needed to make lambda work in loop properly explenation:

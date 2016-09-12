@@ -19,6 +19,7 @@ import pickle
 import os
 import singletons
 from dock_window import DockWindow
+from utils import *
 
 class FinalMetaclass(pyqtWrapperType, ABCMeta):
     pass
@@ -28,14 +29,23 @@ class Asset(QObject, metaclass=FinalMetaclass):
     on_scene = False
     is_file = False
 
+    @trace
     def __init__(self, name, state=None, is_file=False, on_scene=False):
-        print("Asset::__init__")
+        '''
+        There are 3 options to create an asset:
+        - it may be "new"
+        - it may be loaded from file
+        - it may be created our of existing state (?)
+        '''
         super().__init__()
         self.name = name
         self.on_scene = on_scene
         self.is_file = is_file
         if state is None:
-            state = self.createEmptyState()
+            if is_file:
+                self.load_from_file(name)
+            else:
+                state = self.createEmptyState()
         self.setState(state)
 
     @classmethod
@@ -57,7 +67,8 @@ class Asset(QObject, metaclass=FinalMetaclass):
         file_name = os.path.join(project_path,"New " + name)
         extension = asset_type.fileExtensions()[0]
         new_name = cls.make_new_name(file_name,extension)
-        new_asset = asset_type(new_name)
+        new_state = cls.createEmptyState()
+        new_asset = asset_type(new_name,new_state)
         new_asset.save_to_file(new_name)
         return new_name
 
@@ -98,13 +109,13 @@ class Asset(QObject, metaclass=FinalMetaclass):
     def setState(self, state):
         pass
 
+    @trace
     def load_from_file(self, file_name):
         '''
         Basic method to load state from file.
         If you want to support conversion from other format then in inherited class override this method
         and add conversion step to state
         '''
-        print("Asset::load_from_file")
         self.name = file_name
         self.is_file = True
         f = open(self.name, 'rb')
@@ -169,12 +180,13 @@ class Assets():
         self.extension_mapping = dict()
         self.init_file_extensions()
 
+
+    @trace
     def load_file(self, file_name):
-        print("Assets::load_file")
         extension = os.path.splitext(file_name)[1].lower()
         if extension in self.extension_mapping:
             asset_class = self.extension_mapping[extension]
-            asset_instance = asset_class(file_name, True)
+            asset_instance = asset_class(file_name, None, is_file=True)
             return asset_instance
         return None
 

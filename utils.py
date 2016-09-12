@@ -1,57 +1,39 @@
 import inspect
-import os
-import sys
+import wrapt
 
-def format_arg_value(arg_val):
-    """ Return a string representing a (name, value) pair.
-    >>> format_arg_value(('x', (1, 2, 3)))
-    'x=(1, 2, 3)'
-    """
-    arg, val = arg_val
-    return "%s=%r" % (arg, val)
+@wrapt.decorator
+def trace(wrapped, instance, args, kwargs):
+    '''
+    My custom tracing decorator that doesn't change function signature and works well with defaults and *args
+    '''
+    function_name = wrapped.__name__
+    if instance.__class__ is not type(None):
+        class_name = instance.__class__.__name__ + '.'
+        arg_index = 1
+    else:
+        class_name = ''
+        arg_index = 0
 
-def trace(fn, write=sys.stdout.write):
-    """ Echo calls to a function.
+    argument_names = inspect.getfullargspec(wrapped).args
+    defaults = inspect.getfullargspec(wrapped).defaults
+    if defaults is None:
+        len_defaults = 0
+    else:
+        len_defaults = len(defaults)
+    arguments_count = max(len(args),len_defaults)
+    arguments = ''
+    for i in range(arguments_count):
+        if i != 0:
+            arguments += ','
 
-    Returns a decorated version of the input function which "echoes" calls
-    made to it by writing out the function's name and the arguments it was
-    called with.
-    """
-    import functools
-    # Unpack function's arg count, arg names, arg defaults
-    code = fn.__code__
-    argcount = code.co_argcount
-    argnames = code.co_varnames[:argcount]
-    fn_defaults = fn.__defaults__ or list()
-    argdefs = dict(zip(argnames[-len(fn_defaults):], fn_defaults))
-
-    @functools.wraps(fn)
-    def wrapped(*v, **k):
-        # Collect function arguments by chaining together positional,
-        # defaulted, extra positional and keyword arguments.
-        positional = map(format_arg_value, zip(argnames, v))
-        defaulted = [format_arg_value((a, argdefs[a]))
-                     for a in argnames[len(v):] if a not in k]
-        nameless = map(repr, v[argcount:])
-        keyword = map(format_arg_value, k.items())
-        args = list(positional) + list(defaulted) + list(nameless) + list(keyword)
-        class_name = fn.__class__
-        write( fn.__name__ + "(%s)\n" % ", ".join(args))
-        return fn(*v, **k)
-    return wrapped
-
-def inspect_call_args(show_params=True):
-    frame = inspect.currentframe().f_back
-    args, _, _, values = inspect.getargvalues(frame)
-    frame_info = inspect.getframeinfo(frame)
-    print(os.path.basename(frame_info.filename) + '[' + str(frame_info.lineno) + ']:' + frame_info.function, end="(")
-    index = 0
-    for i in args:
-        if show_params:
-            if index != 0:
-                print(',', end=" ")
-            print('{:s}={:s}'.format(repr(i), repr(values[i])), end="")
-        index += 1
-    print(')')
-
-
+        if (arg_index+i < len(argument_names)):
+            name = argument_names[arg_index+i] + '='
+        else:
+            name = ''
+        if i<len(args):
+            value = args[i]
+        else:
+            value = defaults[i]
+        arguments += str(name) + str(value)
+    print( class_name + function_name + '(' + arguments + ')' )
+    return wrapped(*args, **kwargs)

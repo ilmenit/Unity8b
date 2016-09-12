@@ -32,7 +32,7 @@ class AssetsWindow(DockWindow):
         self.dir_view.setRootIndex(root)
         self.dir_view.setSortingEnabled(True)
         self.dir_view.sortByColumn(0, Qt.AscendingOrder)
-        self.dir_view.setWindowTitle("Dir View")
+        #self.dir_view.setWindowTitle("Dir View")
         self.dir_view.hideColumn(1)
         self.dir_view.hideColumn(2)
         self.dir_view.hideColumn(3)
