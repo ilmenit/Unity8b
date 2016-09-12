@@ -46,7 +46,7 @@ class Asset(QObject, metaclass=FinalMetaclass):
                 self.load_from_file(name)
             else:
                 state = self.createEmptyState()
-        self.setState(state)
+                self.setState(state)
 
     @classmethod
     def make_new_name(cls, file_name, extension):
@@ -157,14 +157,14 @@ class CommandChangeAsset(QUndoCommand):
         #print(str(self.new_state))
         self.asset.setState(self.new_state)
         if self.asset.is_file:
-            self.asset.save_to_file()
+            self.asset.save_to_file(self.asset.name)
 
     def undo(self):
         #print("CommandChangeAsset::UNDO " + self.asset.name)
         #print(str(self.old_state))
         self.asset.setState(self.old_state)
         if self.asset.is_file:
-            self.asset.save_to_file()
+            self.asset.save_to_file(self.asset.name)
 
 
 class Assets():
