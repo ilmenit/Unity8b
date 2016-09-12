@@ -9,8 +9,8 @@ class AssetsWindow(DockWindow):
     def dirViewClicked(self, index):
         path = self.dir_model.fileInfo(index).filePath()
         dir = QDir(self.dir_model.rootPath())
-        path = dir.relativeFilePath(path)
-        print("Double Clicked " + str(path))
+        relative_path = dir.relativeFilePath(path)
+        print("Double Clicked " + str(relative_path))
         asset = self.parent().assets.load_file(path)
         if asset is None:
             console.error("Cannot load asset: " + path)

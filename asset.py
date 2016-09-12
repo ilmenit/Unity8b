@@ -29,8 +29,8 @@ class Asset(QObject, metaclass=FinalMetaclass):
     on_scene = False
     is_file = False
 
-    @trace
     def __init__(self, name, state=None, is_file=False, on_scene=False):
+        inspect_call_args()
         '''
         There are 3 options to create an asset:
         - it may be "new"
@@ -109,8 +109,8 @@ class Asset(QObject, metaclass=FinalMetaclass):
     def setState(self, state):
         pass
 
-    @trace
     def load_from_file(self, file_name):
+        inspect_call_args()
         '''
         Basic method to load state from file.
         If you want to support conversion from other format then in inherited class override this method
@@ -181,12 +181,12 @@ class Assets():
         self.init_file_extensions()
 
 
-    @trace
-    def load_file(self, file_name):
-        extension = os.path.splitext(file_name)[1].lower()
+    def load_file(self, file_path):
+        inspect_call_args()
+        extension = os.path.splitext(file_path)[1].lower()
         if extension in self.extension_mapping:
             asset_class = self.extension_mapping[extension]
-            asset_instance = asset_class(file_name, None, is_file=True)
+            asset_instance = asset_class(file_path, None, is_file=True)
             return asset_instance
         return None
 

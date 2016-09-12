@@ -38,8 +38,8 @@ class GfxEditorWindow(AssetEditorWindow):
                                      "The graphics has been modified. Do you want to store it?", QMessageBox.Yes |
                                      QMessageBox.No, QMessageBox.No)
 
-    @trace
     def setAsset(self, asset):
+        inspect_call_args()
         if self.gfx is not None:
             self.gfx.data_changed.disconnect(self.dataChangedHandler)
         self.gfx = asset

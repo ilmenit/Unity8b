@@ -1,5 +1,35 @@
 import inspect
 import wrapt
+import os
+import sys
+
+def inspect_call_args(show_params=True):
+    '''
+    Printing call arguments without using decorators.
+    Preferred because in case of nested calls with decorator stack trace gets ugly
+    '''
+    frame = inspect.currentframe().f_back.f_back
+    #frame = inspect.currentframe().f_back
+    args, _, _, values = inspect.getargvalues(frame)
+    frame_info = inspect.getframeinfo(frame)
+    if 'self' in frame.f_locals:
+        name = repr(frame.f_locals['self'].__class__.__name__) + '.'
+        arg_index = 1
+    else:
+        name=''
+        arg_index = 0
+    print(os.path.basename(frame_info.filename) + '[' + str(frame_info.lineno) + ']:' + name + frame_info.function, end="(")
+
+    printed = 0
+    for i in range(arg_index,len(args)):
+        argument = args[i]
+        if show_params:
+            if printed != 0:
+                print(',', end=" ")
+            print('{:s}={:s}'.format(repr(argument), repr(values[argument])), end="")
+        printed += 1
+    print(')')
+    sys.stdout.flush()
 
 @wrapt.decorator
 def trace(wrapped, instance, args, kwargs):
