@@ -108,12 +108,14 @@ class MainWindow(QMainWindow):
         pass
 
     def create_new_asset(self, asset_type):
-        file_name = Asset.createAsNewFile(asset_type, asset_type.typeName(), self.project.path)
+        new_asset = Asset.createAsNewFile(asset_type, asset_type.typeName())
+        file_name = new_asset.name
         print("file name " + file_name)
         new_index = self.assetsWindow.dir_model.index(file_name)
         print("New index " + str(new_index))
-        self.assetsWindow.dir_view.setCurrentIndex(new_index)
+        self.assetsWindow.assets_tree.setCurrentIndex(new_index)
         self.assetsWindow.show()
+        new_asset.openInEditor()
 
     def buildAssetsMenu(self, menu):
         inspect_call_args()

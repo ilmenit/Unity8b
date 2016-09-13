@@ -63,14 +63,15 @@ class Asset(QObject, metaclass=FinalMetaclass):
         pass
 
     @classmethod
-    def createAsNewFile(cls, asset_type, name, project_path):
-        file_name = os.path.join(project_path,"New " + name)
+    def createAsNewFile(cls, asset_type, name):
+        file_name = project_path_to_full_path("New " + name)
         extension = asset_type.fileExtensions()[0]
         new_name = cls.make_new_name(file_name,extension)
         new_state = cls.createEmptyState()
-        new_asset = asset_type(new_name,new_state)
+        relative_name = full_path_to_project_path(new_name)
+        new_asset = asset_type(relative_name,new_state)
         new_asset.save_to_file(new_name)
-        return new_name
+        return new_asset
 
     @classmethod
     @abstractmethod
@@ -116,9 +117,9 @@ class Asset(QObject, metaclass=FinalMetaclass):
         If you want to support conversion from other format then in inherited class override this method
         and add conversion step to state
         '''
-        self.name = file_name
+        self.name = full_path_to_project_path(file_name)
         self.is_file = True
-        f = open(self.name, 'rb')
+        f = open(file_name, 'rb')
         if not f:
             console.error("Cannot open file for reading " + self.ile_name)
             return
@@ -126,12 +127,11 @@ class Asset(QObject, metaclass=FinalMetaclass):
             state = pickle.load(f)
         except:
             console.error("Cannot load file " + self.name)
-            return
         self.setState(state)
 
     def save_to_file(self, file_name):
         print("Asset::save_to_file")
-        self.name = file_name
+        self.name = full_path_to_project_path(file_name)
         self.is_file = True
         state = self.getState()
         f = open(self.name, 'wb')
@@ -142,6 +142,9 @@ class Asset(QObject, metaclass=FinalMetaclass):
             pickle.dump(state, f)
         except:
             console.error("Cannot save file " + self.name)
+            f.close()
+            #os.remove(file_name)
+            raise
             return
 
 
@@ -199,6 +202,7 @@ class Assets():
 
 class AssetEditorWindow(DockWindow, metaclass=FinalMetaclass):
     data_changed = pyqtSignal(object, name='dataChanged')
+    asset = None
 
     @classmethod
     @abstractmethod
@@ -207,7 +211,16 @@ class AssetEditorWindow(DockWindow, metaclass=FinalMetaclass):
 
     @abstractmethod
     def setAsset(self, asset):
-        pass
+        if self.asset is not None:
+            self.asset.data_changed.disconnect(self.dataChangedHandler)
+
+        if asset is not None:
+            self.asset = asset
+            self.asset.data_changed.connect(self.dataChangedHandler)
+
+    def closeEvent(self, QCloseEvent):
+        self.setAsset(None)
+        super().closeEvent(QCloseEvent)
 
     @abstractmethod
     def dataChangedHandler(self):
@@ -215,3 +228,4 @@ class AssetEditorWindow(DockWindow, metaclass=FinalMetaclass):
 
     def __init__(self, parent):
         super().__init__(self.windowName(), parent)
+

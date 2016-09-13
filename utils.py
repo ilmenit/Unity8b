@@ -2,6 +2,8 @@ import inspect
 import wrapt
 import os
 import sys
+import singletons
+from PyQt5.QtCore import *
 
 def inspect_call_args(show_params=True):
     '''
@@ -67,3 +69,11 @@ def trace(wrapped, instance, args, kwargs):
         arguments += str(name) + str(value)
     print( class_name + function_name + '(' + arguments + ')' )
     return wrapped(*args, **kwargs)
+
+def full_path_to_project_path(file_path):
+    dir = QDir(singletons.main_window.project.path)
+    relative_path = dir.relativeFilePath(file_path)
+    return relative_path
+
+def project_path_to_full_path(project_path):
+    return os.path.join(singletons.main_window.project.path,project_path)

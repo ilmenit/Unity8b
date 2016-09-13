@@ -3,7 +3,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from dock_window import DockWindow
 from gfx_atari import *
-from asset_playfield_palette import *
 from asset import *
 
 class GfxEditorWindow(AssetEditorWindow):
@@ -12,24 +11,24 @@ class GfxEditorWindow(AssetEditorWindow):
         return "Gfx Editor"
 
     def resizeEvent(self, QResizeEvent):
-        if self.gfx is not None:
+        if self.asset is not None:
             self.view.scaleToContent()
 
     def dataChangedHandler(self):
-        self.pixmapItem.setPixmap(QPixmap.fromImage(self.gfx.toQImage()))
+        self.pixmapItem.setPixmap(QPixmap.fromImage(self.asset.toQImage()))
 
     def mousePressedHandler(self, point):
-        self.old_state = self.gfx.getState()
+        self.old_state = self.asset.getState()
         color_index = self.parent().paletteEditorWindow.selected_color
-        self.gfx.putPixel(int(point.x()), int(point.y()),color_index)
+        self.asset.putPixel(int(point.x()), int(point.y()), color_index)
 
     def mouseMovedHandler(self, point):
         color_index = self.parent().paletteEditorWindow.selected_color
-        self.gfx.putPixel(int(point.x()), int(point.y()),color_index)
+        self.asset.putPixel(int(point.x()), int(point.y()), color_index)
 
     def mouseReleasedHandler(self):
-        new_state = self.gfx.getState()
-        command = CommandChangeAsset(self.gfx, self.old_state, new_state)
+        new_state = self.asset.getState()
+        command = CommandChangeAsset(self.asset, self.old_state, new_state)
         self.undoStack.push(command)
 
     def saveOnExit(self):
@@ -40,16 +39,13 @@ class GfxEditorWindow(AssetEditorWindow):
 
     def setAsset(self, asset):
         inspect_call_args()
-        if self.gfx is not None:
-            self.gfx.data_changed.disconnect(self.dataChangedHandler)
-        self.gfx = asset
+        super().setAsset(asset)
         if asset is not None:
-            self.pixmap = QPixmap.fromImage(self.gfx.toQImage())
-            self.scene = GridScene(self, self.gfx.width,self.gfx.height, self.gfx.pixel_width_ration)
+            self.pixmap = QPixmap.fromImage(self.asset.toQImage())
+            self.scene = GridScene(self, self.asset.state.width, self.asset.state.height, self.asset.state.pixel_width_ratio)
             self.pixmapItem = QGraphicsPixmapItem(self.pixmap)
             self.scene.addItem(self.pixmapItem)
             self.scene.createGrid()
-            self.gfx.data_changed.connect(self.dataChangedHandler)
             self.dataChangedHandler()
             self.view = MyGraphicsView(self.scene)
 
@@ -61,11 +57,8 @@ class GfxEditorWindow(AssetEditorWindow):
         else:
             self.setWidget(QWidget())
 
-
-
     def __init__(self, parent):
         super().__init__(parent)
-        self.gfx = None
+        self.asset = None
         self.old_state = None
         self.setAsset(None)
-

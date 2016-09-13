@@ -4,9 +4,22 @@ from PyQt5.QtWidgets import *
 from dock_window import *
 from asset import *
 from console import *
+
+class AssetsTree(QTreeView):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+    def dataChangedHandler(self):
+        inspect_call_args()
+        self.sortByColumn(0, Qt.AscendingOrder)
+
+    def changeEvent(self, *args, **kwargs): # real signature unknown
+        self.dataChangedHandler()
+
+
 class AssetsWindow(DockWindow):
 
-    def dirViewClicked(self, index):
+    def fileActivated(self, index):
         path = self.dir_model.fileInfo(index).filePath()
         dir = QDir(self.dir_model.rootPath())
         relative_path = dir.relativeFilePath(path)
@@ -17,6 +30,7 @@ class AssetsWindow(DockWindow):
         else:
             asset.openInEditor()
 
+
     def loadFileHandler(self, file_name):
         print("Loading file " + file_name)
 
@@ -24,20 +38,21 @@ class AssetsWindow(DockWindow):
         super().__init__("Assets", parent)
         self.dir_model = QFileSystemModel()
         self.dir_model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.AllEntries)
-        #model.setReadOnly(False)
+        self.dir_model.setReadOnly(True)
 
-        self.dir_view = QTreeView()
-        self.dir_view.setModel(self.dir_model)
+        self.assets_tree = AssetsTree(self)
+        self.assets_tree.setModel(self.dir_model)
         root = self.dir_model.setRootPath(parent.project.path)
-        self.dir_view.setRootIndex(root)
-        self.dir_view.setSortingEnabled(True)
-        self.dir_view.sortByColumn(0, Qt.AscendingOrder)
+        self.assets_tree.setRootIndex(root)
+        self.assets_tree.setSortingEnabled(True)
+        self.assets_tree.sortByColumn(0, Qt.AscendingOrder)
         #self.dir_view.setWindowTitle("Dir View")
-        self.dir_view.hideColumn(1)
-        self.dir_view.hideColumn(2)
-        self.dir_view.hideColumn(3)
-        self.dir_view.header().setVisible(False)
-        self.dir_view.show()
-        self.dir_view.doubleClicked.connect(self.dirViewClicked)
-        self.setWidget(self.dir_view)
+        self.assets_tree.hideColumn(1)
+        self.assets_tree.hideColumn(2)
+        self.assets_tree.hideColumn(3)
+        self.assets_tree.header().setVisible(False)
+        self.assets_tree.show()
+        self.assets_tree.activated.connect(self.fileActivated)
+        self.assets_tree.clicked.connect(self.fileActivated)
+        self.setWidget(self.assets_tree)
 

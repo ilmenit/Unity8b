@@ -1,9 +1,5 @@
 '''
 This is an abstract base class for pixel level operations on different graphics modes
-
-Modes have:
-- different encoding of pixels into memory representation
--
 '''
 
 from abc import ABCMeta, abstractmethod
@@ -12,7 +8,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from asset import *
 
-class GfxABC(Asset):
+class GfxAsset(Asset):
 
     @abstractmethod
     def getPixel(self, x, y):

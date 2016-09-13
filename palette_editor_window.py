@@ -27,6 +27,8 @@ class PaletteEditorWindow(AssetEditorWindow):
 
     def changeColorRegister(self, register, value):
         print("changeColorRegister " + str(register) + " to " + str(value))
+        if self.asset is None:
+            return
         old_state = self.asset.getState()
         new_state = copy(old_state)
         new_state[register] = value
