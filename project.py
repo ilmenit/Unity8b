@@ -5,7 +5,7 @@ from project_platform import *
 class Project():
     def __init__(self, name):
         self.main_memory = MemoryBuffer(65536)
-        self.path = 'examples/arkanoid'
+        self.path = 'examples/shooter'
         self.name = name
         self.platform = PlatformAtariXl()
         self.game_data = {

@@ -13,7 +13,7 @@ from asset_playfield_palette import *
 
 default_tileset = {
     # "file_name" : "default.fnt",
-    "file_name" : 'examples/arkanoid/default.fnt',
+    "file_name" : 'examples/shooter/default.fnt',
     "tiles_count" : 128,
     "tile_size_x" : 4,
     "tile_size_y" : 8,

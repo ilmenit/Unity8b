@@ -77,7 +77,6 @@ class PaletteEditorWindow(AssetEditorWindow):
         self.createWidget()
 
     def dataChangedHandler(self):
-        #print("PALETTE DATA CHANGED")
         for i in range(len(self.asset.data)):
             value = self.asset.data[i]
             self.frames[i].setColor(global_indexed_palette[value])

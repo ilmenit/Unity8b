@@ -1,0 +1,21 @@
+@public DWORD value
+@public playfield_object representation
+@public zero_tile_number
+
+procedure add(DWORD to_add)
+begin
+    value += to_add
+    representation[0]=1
+    representation[2]=2
+    representation[3]=3
+    representation[4]=4
+end
+
+procedure zero():
+begin
+    value = 0
+end
+
+procedure update()
+begin
+end

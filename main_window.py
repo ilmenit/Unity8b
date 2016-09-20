@@ -11,6 +11,7 @@ from palette_editor_window import PaletteEditorWindow
 from color_picker_window import ColorPickerWindow
 from undo_view_window import UndoViewWindow
 from assets_window import AssetsWindow
+from inspector_window import InspectorWindow
 from console import console
 from project import *
 from project import *
@@ -185,6 +186,7 @@ class MainWindow(QMainWindow):
         self.paletteEditorWindow.inform_color_picker.connect(self.colorPickerWindow.activateColor)
         self.paletteEditorWindow.data_changed.connect(self.gfxEditorWindow.update)
         self.undoViewWindow = UndoViewWindow(self)
+        self.inspectorWindow = InspectorWindow(self)
 
         console.init(self.consoleWindow)
 

@@ -1,0 +1,7 @@
+Ideas for game demos:
+- snake - joy + playfield + tileset + score (custom object) - on the same playfield
+- arkanoid - joy + 2 playfields + 2 tilesets + sprite + score + lives + tilescreen playfield?
+- shooter - 2 players, 2 sprites with different frames, multiple playfield enemies with different size, scrolling
+- adventure - point and click adventure with loading GFX?
+- dynamic playfield generation - with moving playfield and color changes
+- infinite shooter ala blue-max?

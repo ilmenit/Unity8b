@@ -2,8 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-import collections
-pos = collections.namedtuple("pos", ("row, column"))
+#import collections
+#pos = collections.namedtuple("pos", ("row, column"))
 
 class DockWindow(QDockWidget):
     def __init__(self, name, parent):

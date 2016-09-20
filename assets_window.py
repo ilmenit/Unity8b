@@ -38,7 +38,7 @@ class AssetsWindow(DockWindow):
         super().__init__("Assets", parent)
         self.dir_model = QFileSystemModel()
         self.dir_model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.AllEntries)
-        self.dir_model.setReadOnly(True)
+        self.dir_model.setReadOnly(False)
 
         self.assets_tree = AssetsTree(self)
         self.assets_tree.setModel(self.dir_model)
@@ -54,5 +54,6 @@ class AssetsWindow(DockWindow):
         self.assets_tree.show()
         self.assets_tree.activated.connect(self.fileActivated)
         self.assets_tree.clicked.connect(self.fileActivated)
+        self.assets_tree.setEditTriggers(QAbstractItemView.DoubleClicked | QAbstractItemView.EditKeyPressed)
         self.setWidget(self.assets_tree)
 
