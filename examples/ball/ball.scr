@@ -1,6 +1,11 @@
-@public byte x,y
-@public sprite_object ball
-@public playfield_collider
+@public
+byte x,y
+
+@public
+sprite_object ball
+
+@public
+playfield_collider
 
 procedure start()
 begin

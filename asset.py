@@ -20,6 +20,7 @@ import os
 import singletons
 from dock_window import DockWindow
 from utils import *
+from sip import wrappertype as pyqtWrapperType
 
 class FinalMetaclass(pyqtWrapperType, ABCMeta):
     pass

@@ -5,3 +5,4 @@ Ideas for game demos:
 - adventure - point and click adventure with loading GFX?
 - dynamic playfield generation - with moving playfield and color changes
 - infinite shooter ala blue-max?
+- civilization-like game?

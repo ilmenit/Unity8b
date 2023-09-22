@@ -1,0 +1,4 @@
+wrapt
+intervaltree==2.1.0
+QDarkStyle==2.2.1
+pyqt5=5.7

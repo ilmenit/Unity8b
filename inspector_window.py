@@ -57,3 +57,4 @@ class InspectorWindow(DockWindow):
         self.setWidget(self.main_widget)
 
         self.main_layout.addWidget(ObjectInspector(self.main_widget))
+        self.main_layout.addWidget(ObjectInspector(self.main_widget))
